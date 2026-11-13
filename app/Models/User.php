@@ -7,12 +7,11 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Route;
 
-// Menambahkan role dan is_active
-#[Fillable(['name', 'email', 'password', 'role', 'is_active'])]
+#[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -27,33 +26,38 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed', 
+            'password' => 'hashed',
             'is_active' => 'boolean',
         ];
     }
 
-    public function hasRole(string ...$roles): bool
+    public function isOwner(): bool
     {
-        return in_array($this->role, $roles, true);
+        return $this->role === self::ROLE_OWNER;
     }
 
-    public function roleLabel(): string
+    public function isCashier(): bool
+    {
+        return $this->role === self::ROLE_CASHIER;
+    }
+
+    public function isCustomer(): bool
+    {
+        return $this->role === self::ROLE_CUSTOMER;
+    }
+
+    // Mengembalikan NAMA route, dipakai seperti route($user->homeRoute()).
+    public function homeRoute(): string
     {
         return match ($this->role) {
-            self::ROLE_OWNER => 'Pemilik',
-            self::ROLE_CASHIER => 'Kasir',
-            default => 'Pelanggan',
-        };
-    }
-
-    public function dashboardUrl(): string
-    {
-        $routeName = match ($this->role) {
             self::ROLE_OWNER => 'owner.dashboard',
             self::ROLE_CASHIER => 'cashier.dashboard',
             default => 'customer.dashboard',
         };
+    }
 
-        return Route::has($routeName) ? route($routeName) : url('/');
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class, 'user_id');
     }
 }
