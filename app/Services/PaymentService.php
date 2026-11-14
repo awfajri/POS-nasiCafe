@@ -9,7 +9,7 @@ class PaymentService
 {
     public function remainingItems($transaction): Collection
     {
-        throw new \LogicException('Belum diimplementasi');
+        throw new \LogicException(__METHOD__.' belum diimplementasi');
     }
 
     public function pay(
@@ -20,7 +20,7 @@ class PaymentService
         ?int $cashReceived = null,
         ?string $payerName = null
     ) {
-        throw new \LogicException('Belum diimplementasi');
+        throw new \LogicException(__METHOD__.' belum diimplementasi');
     }
 
     public function payRemaining(
@@ -30,6 +30,6 @@ class PaymentService
         ?int $cashReceived = null,
         ?string $payerName = null
     ) {
-        throw new \LogicException('Belum diimplementasi');
+        throw new \LogicException(__METHOD__.' belum diimplementasi');
     }
 }

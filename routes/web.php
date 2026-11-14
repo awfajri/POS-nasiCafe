@@ -8,19 +8,27 @@ Route::get('/', function () {
         return Route::has('login') ? redirect()->route('login') : redirect('/login');
     }
 
-    /** @var \App\Models\User $user */
+    /** @var \App\Models\User|null $user */
     $user = Auth::user();
 
-    if ($user && method_exists($user, 'homeRoute') && Route::has($user->homeRoute())) {
-        return redirect()->route($user->homeRoute());
+    if ($user && method_exists($user, 'homeRoute')) {
+        $homeRoute = $user->homeRoute();
+
+        if (is_string($homeRoute) && $homeRoute !== '' && Route::has($homeRoute)) {
+            return redirect()->route($homeRoute);
+        }
     }
 
-    return match ($user->role ?? null) {
-        'owner' => Route::has('owner.dashboard') ? redirect()->route('owner.dashboard') : abort(403),
-        'cashier' => Route::has('cashier.dashboard') ? redirect()->route('cashier.dashboard') : abort(403),
-        'customer' => Route::has('customer.dashboard') ? redirect()->route('customer.dashboard') : abort(403),
-        default => abort(403),
+    $targetRoute = match ($user->role ?? null) {
+        'owner' => 'owner.dashboard',
+        'cashier' => 'cashier.dashboard',
+        'customer' => 'customer.dashboard',
+        default => abort(403, 'Peran pengguna tidak memiliki akses.'),
     };
+
+    return Route::has($targetRoute)
+        ? redirect()->route($targetRoute)
+        : abort(503, "Rute [{$targetRoute}] belum tersedia.");
 });
 
 require __DIR__.'/auth.php';

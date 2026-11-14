@@ -1,3 +1,7 @@
+@php
+    $currentUser = auth()->user();
+    $pageTitle = trim($__env->yieldContent('header') ?: $__env->yieldContent('title', 'Dashboard'));
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -8,22 +12,59 @@
         @stack('styles')
     </head>
     <body class="font-sans antialiased bg-surface-light text-ink-primary">
-        <div class="min-h-screen flex flex-col lg:flex-row">
+        <div x-data="{ sidebarOpen: false }" class="min-h-screen flex flex-col lg:flex-row">
             <!-- Sidebar / Navigasi -->
             <aside class="w-full lg:w-64 bg-surface-card border-b lg:border-b-0 lg:border-r border-surface-border shrink-0">
                 <div class="p-5 flex items-center justify-between">
-                    <a href="/" class="text-xl font-bold text-brand-600">Nasi Cafe</a>
-                    @if (auth()->check())
-                        <span class="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-600 capitalize">
-                            {{ auth()->user()->role ?? 'User' }}
-                        </span>
-                    @endif
+                    <div class="flex items-center gap-2.5">
+                        <a href="/" class="text-xl font-bold text-brand-600">Nasi Cafe</a>
+                        @if ($currentUser)
+                            <span class="rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-600 capitalize">
+                                {{ $currentUser->role ?? 'User' }}
+                            </span>
+                        @endif
+                    </div>
+
+                    <button
+                        @click="sidebarOpen = !sidebarOpen"
+                        type="button"
+                        class="lg:hidden rounded-lg p-1.5 text-ink-muted hover:bg-surface-light focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        :aria-expanded="sidebarOpen.toString()"
+                        aria-controls="primary-navigation"
+                        aria-label="Toggle navigasi"
+                    >
+                        <span aria-hidden="true">&#9776;</span>
+                    </button>
                 </div>
 
-                <nav class="px-3 pb-4 space-y-1" aria-label="Navigasi Utama">
-                    <a href="/" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-brand-600 bg-brand-50">
+                <nav
+                    id="primary-navigation"
+                    :class="sidebarOpen ? 'block' : 'hidden lg:block'"
+                    class="px-3 pb-4 space-y-1"
+                    aria-label="Navigasi Utama"
+                >
+                    <a
+                        href="/"
+                        @class([
+                            'block rounded-lg px-3 py-2.5 text-sm font-medium transition',
+                            'bg-brand-50 text-brand-600' => request()->is('/'),
+                            'text-ink-muted hover:bg-surface-light hover:text-ink-primary' => ! request()->is('/'),
+                        ])
+                    >
                         Dashboard
                     </a>
+
+                    @if ($currentUser && Route::has('logout'))
+                        <form method="POST" action="{{ route('logout') }}" class="pt-2 mt-2 border-t border-surface-border">
+                            @csrf
+                            <button
+                                type="submit"
+                                class="w-full text-left rounded-lg px-3 py-2.5 text-sm font-medium text-status-danger hover:bg-status-danger/10 transition"
+                            >
+                                Keluar
+                            </button>
+                        </form>
+                    @endif
                 </nav>
             </aside>
 
@@ -32,12 +73,12 @@
                 <!-- Top Header -->
                 <header class="bg-surface-card border-b border-surface-border px-6 py-4 flex items-center justify-between">
                     <div>
-                        <h1 class="text-lg font-semibold">@yield('header', 'Dashboard')</h1>
+                        <h1 class="text-lg font-semibold">{{ $pageTitle }}</h1>
                     </div>
                     <div class="flex items-center gap-3">
                         <div class="text-right hidden sm:block">
-                            <p class="text-sm font-medium">{{ auth()->user()->name ?? 'Pengguna' }}</p>
-                            <p class="text-xs text-ink-muted">{{ auth()->user()->email ?? '' }}</p>
+                            <p class="text-sm font-medium">{{ $currentUser->name ?? 'Pengguna' }}</p>
+                            <p class="text-xs text-ink-muted">{{ $currentUser->email ?? '' }}</p>
                         </div>
                     </div>
                 </header>

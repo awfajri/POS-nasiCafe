@@ -14,36 +14,36 @@ class TransactionService
         ?User $customer = null,
         ?User $cashier = null
     ) {
-        throw new \LogicException('Belum diimplementasi');
+        throw new \LogicException(__METHOD__.' belum diimplementasi');
     }
 
     public function changeStatus($transaction, string $to, ?User $actor = null)
     {
-        throw new \LogicException('Belum diimplementasi');
+        throw new \LogicException(__METHOD__.' belum diimplementasi');
     }
 
     public function allowedTransitions($transaction): array
     {
-        throw new \LogicException('Belum diimplementasi');
+        throw new \LogicException(__METHOD__.' belum diimplementasi');
     }
 
     public function moveToProcessing($transaction, ?User $actor = null): void
     {
-        throw new \LogicException('Belum diimplementasi');
+        throw new \LogicException(__METHOD__.' belum diimplementasi');
     }
 
     public function deductStock($transaction): void
     {
-        throw new \LogicException('Belum diimplementasi');
+        throw new \LogicException(__METHOD__.' belum diimplementasi');
     }
 
     public function restoreStock($transaction): void
     {
-        throw new \LogicException('Belum diimplementasi');
+        throw new \LogicException(__METHOD__.' belum diimplementasi');
     }
 
     public function cancelExpired(): int
     {
-        throw new \LogicException('Belum diimplementasi');
+        throw new \LogicException(__METHOD__.' belum diimplementasi');
     }
 }
