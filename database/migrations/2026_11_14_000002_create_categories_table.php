@@ -6,23 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('categories', function (Blueprint $table) {
-            $table->id(); // Primary key (auto-increment)
-            $table->string('name')->unique(); // Nama kategori makanan/minuman, harus unik
-            $table->string('slug')->unique(); // Slug untuk URL yang ramah SEO, harus unik
-            $table->text('description')->nullable(); // Deskripsi kategori, bersifat opsional (boleh kosong)
-            $table->timestamps(); // Kolom created_at dan updated_at otomatis
+            $table->id();
+            $table->string('name')->unique();   // gak boleh kembar
+            $table->string('slug')->unique();   // buat url
+            $table->text('description')->nullable();
+            $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('categories');

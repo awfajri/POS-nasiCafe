@@ -34,4 +34,5 @@ Aturan:
 
 ### Hasil review dan perubahan oleh saya
 
-(diisi nanti setelah audit)
+yang aku ubah, komentar dari ai terlalu panjang, jadi aku persingkat.
+terus name dan slug itu dibuat unique karena supaya gada kategori yg kembar, terus up () itu untuk bikin tabel dan down () itu unyuk hapus saat rollback.
