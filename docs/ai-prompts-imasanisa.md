@@ -36,3 +36,44 @@ Aturan:
 
 yang aku ubah, komentar dari ai terlalu panjang, jadi aku persingkat.
 terus name dan slug itu dibuat unique karena supaya gada kategori yg kembar, terus up () itu untuk bikin tabel dan down () itu unyuk hapus saat rollback.
+
+---
+
+## Prompt 2 - Migration menus
+
+- Tanggal: 15 November 2026
+- Branch: feature/master-schema
+- Tool AI: Antigravity
+- Bagian yang diminta: migration tabel menus
+- Catatan: prompt disusun dengan bantuan Claude, lalu dikirim ke Antigravity.
+
+### Prompt yang dikirim
+
+haii, aku aku lagi ngerjain proyek kelompok "NasiCafe POS" (Laravel 13, PHP 8.5, MySQL), modul Master Data. Branch saat ini: feature/master-schema. Tabel categories udah dibuat lewat migration sebelumnya.
+
+Tugasnya buatin SATU file migration aja untuk tabel `menus`.
+
+Aturannya
+
+1. Nama file harus persis: database/migrations/2026_11_14_000003_create_menus_table.php (nama sudah dikunci tim, jangan diubah).
+2. Kolom:
+    - id
+    - category_id: foreignId, constrained ke tabel categories, restrictOnDelete
+    - name: string
+    - price: unsignedInteger
+    - stock: unsignedInteger, default 0
+    - min_stock: unsignedInteger, default 5
+    - image_path: string, nullable
+    - is_available: boolean, default true
+    - timestamps
+3. Gunakan anonymous class (return new class extends Migration).
+4. Method down() berisi Schema::dropIfExists('menus').
+5. Jangan membuat atau mengubah file lain.
+6. Komentar singkat berbahasa Indonesia, cuma pada kolom yang butuh penjelasan.
+
+### Hasil
+
+- File dihasilkan: database/migrations/2026_11_14_000003_create_menus_table.php
+- Commit mentah AI: chore: draft AI migration menus (belum direview)
+
+### Hasil review dan perubahan oleh saya
