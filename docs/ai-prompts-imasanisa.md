@@ -77,3 +77,8 @@ Aturannya
 - Commit mentah AI: chore: draft AI migration menus (belum direview)
 
 ### Hasil review dan perubahan oleh saya
+
+aku hapus semua komentar karena kodenya uda cukup jelas buat dibaca. logika kolom juga ga aku ubah, karena uda bener.
+
+category_id adalah foreign key ke tabel categories, restrictOnDelete itu mencegah kategori dihapus selama masi dipakai menu. price dan stock pakai unsignedInteger supaya ga negatif dan uang
+disimpan sebagai Rupiah penuh. is_available beda dengan stock 0: stock 0 berarti abis sementara, is_available false berarti menu sengaja dinonaktifkan.
