@@ -11,11 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class MenuFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    // isi default data menu palsu
     public function definition(): array
     {
         $menus = [
@@ -67,9 +63,7 @@ class MenuFactory extends Factory
         ];
     }
 
-    /**
-     * State untuk menu dengan stok menipis (stok <= min_stock).
-     */
+    // menu dengan stok menipis (stok <= min_stock)
     public function lowStock(?int $stock = null): static
     {
         return $this->state(fn (array $attributes) => [
@@ -77,9 +71,7 @@ class MenuFactory extends Factory
         ]);
     }
 
-    /**
-     * State untuk menu yang stoknya habis (stok = 0).
-     */
+    // menu yang stoknya habis (stok = 0)
     public function outOfStock(): static
     {
         return $this->state(fn () => [

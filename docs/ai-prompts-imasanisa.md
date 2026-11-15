@@ -162,3 +162,6 @@ aturan MenuFactory nya
 - Commit mentah AI: chore: draft AI CategoryFactory dan MenuFactory (belum direview)
 
 ### Hasil review dan perubahan oleh saya
+
+waktu review aku nemuin bug di CategoryFactory, slug dibuat dari variabel $name yg dipilih acak diawal, jadi kalo name di override (misalnya create(['name' => 'Minuman])), slug nya ga cocok dengan name. terus yauda aku perbaiki dengan ngejadiin name dan slug sebagai closure, jadi slug selalu dihitung dari name yg bener-bener dipakai. terus yg baris $name itu jadi mubazir, dan aku hapus, dan name acak ga lagi ngabisisn jatah unique() kalo di override. teruss unique() cuma punya 50 nama kategori, jadi seeder harus memberi category_id eksplisit kalo membuat banyak menu. yg Parameter ?int $stock di lowStock() adalah tambahan dari AI yg ga
+aku minta, tapi yauda aku biarin karena berguna untuk menu stok kritis.

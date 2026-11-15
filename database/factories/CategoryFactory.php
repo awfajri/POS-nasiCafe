@@ -11,11 +11,7 @@ use Illuminate\Support\Str;
  */
 class CategoryFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    // isi default data kategori palsu
     public function definition(): array
     {
         $categories = [
@@ -71,11 +67,11 @@ class CategoryFactory extends Factory
             'Mocktail Segar',
         ];
 
-        $name = fake()->unique()->randomElement($categories);
-
         return [
-            'name' => $name,
-            'slug' => Str::slug($name),
+            // nama dipilih acak, tapi ga dijalanin kalo name diisi manual
+            'name' => fn () => fake()->unique()->randomElement($categories),
+            // slug selalu dihitung dari name yang benar-benar dipakai
+            'slug' => fn (array $attributes) => Str::slug($attributes['name']),
             'description' => fake()->sentence(6),
         ];
     }
