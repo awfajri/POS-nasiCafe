@@ -82,3 +82,39 @@ aku hapus semua komentar karena kodenya uda cukup jelas buat dibaca. logika kolo
 
 category_id adalah foreign key ke tabel categories, restrictOnDelete itu mencegah kategori dihapus selama masi dipakai menu. price dan stock pakai unsignedInteger supaya ga negatif dan uang
 disimpan sebagai Rupiah penuh. is_available beda dengan stock 0: stock 0 berarti abis sementara, is_available false berarti menu sengaja dinonaktifkan.
+
+## Prompt 3 - Model Category dan Menu
+
+- Tanggal: 15 November 2026
+- Branch: feature/master-schema
+- Tool AI: Antigravity
+- Bagian yang diminta: model Category dan Menu
+- Catatan: prompt disusun dengan bantuan Claude, lalu dikirim ke Antigravity.
+
+### Prompt yang dikirim
+
+halo, akulagi ngerjain proyek kelompok "NasiCafe POS" (Laravel 13, PHP 8.5, MySQL), modul Master Data. Branch: feature/master-schema. Tabel categories dan menus sudah dibuat lewat migration.
+
+tugasnya, buatin DUA file model aja: app/Models/Category.php dan app/Models/Menu.php.
+
+Aturan Categorynya
+
+1. $fillable: name, slug, description.
+2. Relasi menus(): hasMany(Menu::class).
+
+Aturan Menunya
+
+1. $fillable lengkap: category_id, name, price, stock, min_stock, image_path, is_available.
+2. $casts: is_available => boolean.
+3. Relasi category(): belongsTo(Category::class).
+4. Relasi transactionDetails(): hasMany(TransactionDetail::class, 'menu_id'). Jangan membuat model TransactionDetail, itu milik anggota tim lain.
+5. scopeAvailable: where is_available = true.
+6. scopeLowStock: whereColumn('stock', '<=', 'min_stock').
+7. Accessor getImageUrlAttribute(): jika image_path ada, kembalikan Storage::url($this->image_path); jika tidak, asset('images/menu-placeholder.png').
+
+### Hasil
+
+- File dihasilkan: app/Models/Category.php dan app/Models/Menu.php
+- Commit mentah AI: chore: draft AI model Category dan Menu (belum direview)
+
+### Hasil review dan perubahan oleh saya
