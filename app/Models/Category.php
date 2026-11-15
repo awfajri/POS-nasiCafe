@@ -16,6 +16,7 @@ class Category extends Model
         'description',
     ];
 
+    // satu kategori punya banyak menu
     public function menus(): HasMany
     {
         return $this->hasMany(Menu::class);

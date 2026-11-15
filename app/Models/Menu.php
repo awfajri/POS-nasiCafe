@@ -24,8 +24,11 @@ class Menu extends Model
     ];
 
     protected $casts = [
-        'is_available' => 'boolean',
-    ];
+    'is_available' => 'boolean',
+    'price' => 'integer',
+    'stock' => 'integer',
+    'min_stock' => 'integer',
+];
 
     public function category(): BelongsTo
     {
@@ -36,22 +39,22 @@ class Menu extends Model
     {
         return $this->hasMany(TransactionDetail::class, 'menu_id');
     }
-
+    // menu yg masi dijual
     public function scopeAvailable(Builder $query): Builder
     {
         return $query->where('is_available', true);
     }
-
+    // menu yg stoknya menipis
     public function scopeLowStock(Builder $query): Builder
     {
         return $query->whereColumn('stock', '<=', 'min_stock');
     }
-
+    // pakai foto kalo ada, kalo gaada pakai placeholder
     public function getImageUrlAttribute(): string
     {
         if ($this->image_path) {
-            return Storage::url($this->image_path);
-        }
+        return Storage::disk('public')->url($this->image_path);
+    }
 
         return asset('images/menu-placeholder.png');
     }

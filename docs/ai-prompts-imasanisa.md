@@ -118,3 +118,12 @@ Aturan Menunya
 - Commit mentah AI: chore: draft AI model Category dan Menu (belum direview)
 
 ### Hasil review dan perubahan oleh saya
+
+pas aku review, aku nemu 2 hal yang aku perbaiki di menu.php
+
+1. accessor image_url ga nyebut disk. foto nanti disimpan di disk public,
+   jadi akuganti ke Storage::disk('public')->url() supaya URL-nya konsisten.
+2. price, stock, dan min_stock aku tambah cast integer
+   oh yaa aku juga nambahin komentar singkat di scope dan accessor.
+
+    untuk review di category.php, aku cocokin dengan dokumen, fillable (name, slug, description) dan relasi menus() hasMany udah sesuai. logika nya ga aku ubah, cuma nambahin komentar singkat.
