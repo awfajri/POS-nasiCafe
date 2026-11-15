@@ -45,7 +45,6 @@ terus name dan slug itu dibuat unique karena supaya gada kategori yg kembar, ter
 - Branch: feature/master-schema
 - Tool AI: Antigravity
 - Bagian yang diminta: migration tabel menus
-- Catatan: prompt disusun dengan bantuan Claude, lalu dikirim ke Antigravity.
 
 ### Prompt yang dikirim
 
@@ -89,7 +88,6 @@ disimpan sebagai Rupiah penuh. is_available beda dengan stock 0: stock 0 berarti
 - Branch: feature/master-schema
 - Tool AI: Antigravity
 - Bagian yang diminta: model Category dan Menu
-- Catatan: prompt disusun dengan bantuan Claude, lalu dikirim ke Antigravity.
 
 ### Prompt yang dikirim
 
@@ -127,3 +125,40 @@ pas aku review, aku nemu 2 hal yang aku perbaiki di menu.php
    oh yaa aku juga nambahin komentar singkat di scope dan accessor.
 
     untuk review di category.php, aku cocokin dengan dokumen, fillable (name, slug, description) dan relasi menus() hasMany udah sesuai. logika nya ga aku ubah, cuma nambahin komentar singkat.
+
+## Prompt 4 - CategoryFactory dan MenuFactory
+
+- Tanggal: 15 November 2026
+- Branch: feature/master-schema
+- Tool AI: Antigravity
+- Bagian yang diminta: CategoryFactory dan MenuFactory
+
+### Prompt yang dikirim
+
+okee lanjut ya, aku lagi ngerjain proyek kelompok "NasiCafe POS" (Laravel 13, PHP 8.5, MySQL), modul Master Data. Branch: feature/master-schema. Model Category dan Menu sudah ada (sudah memakai HasFactory).
+
+tugasnya buatin DUA file factory aja: database/factories/CategoryFactory.php dan database/factories/MenuFactory.php.
+
+aturan CategoryFactory nya
+
+1. name: unik (pakai unique()), nama kategori makanan/minuman berbahasa Indonesia.
+2. slug: dibuat dari name memakai Str::slug().
+3. description: teks pendek, nullable boleh.
+
+aturan MenuFactory nya
+
+1. category_id: Category::factory().
+2. name: nama menu makanan/minuman berbahasa Indonesia.
+3. price: integer kelipatan 500, antara 5000 sampai 50000.
+4. stock: integer antara 0 sampai 50.
+5. min_stock: 5.
+6. image_path: null.
+7. is_available: true.
+8. Tambahkan state lowStock() (stock di bawah atau sama dengan min_stock) dan state outOfStock() (stock 0).
+
+### Hasil
+
+- File dihasilkan: database/factories/CategoryFactory.php dan database/factories/MenuFactory.php
+- Commit mentah AI: chore: draft AI CategoryFactory dan MenuFactory (belum direview)
+
+### Hasil review dan perubahan oleh saya
