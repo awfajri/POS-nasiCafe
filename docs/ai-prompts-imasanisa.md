@@ -196,3 +196,5 @@ terus aturannya
 - Commit mentah AI: chore: draft AI CategoryRequest (belum direview)
 
 ### Hasil review dan perubahan oleh saya
+
+tadi pas review sempet nemu celah, name unik tapi slug dubuat dari name... jadi "Nasi Spesial" dan "Nasi-Spesial" lolos validasi nama tp bentrok di slug dab bikin error ke database. nah aku nambahin pengecekan slug gitu sih di rules name lewat closure, tapi mengabaikan kategori yg lagi diedit..
