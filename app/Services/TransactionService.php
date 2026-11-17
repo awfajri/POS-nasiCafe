@@ -168,7 +168,7 @@ class TransactionService
 
     public function moveToProcessing($transaction, ?User $actor = null): void
     {
-        DB::transaction(function () use ($transaction): void {
+        DB::transaction(function () use ($transaction, $actor): void {
             $tx = Transaction::query()->lockForUpdate()->findOrFail($transaction->getKey());
 
             if ($tx->status !== Transaction::STATUS_PENDING) {
@@ -179,6 +179,7 @@ class TransactionService
 
             $tx->update([
                 'status' => Transaction::STATUS_PROCESSING,
+                'cashier_id' => $tx->cashier_id ?? $actor?->id,
                 'expires_at' => null,
             ]);
         });
@@ -290,12 +291,11 @@ class TransactionService
     {
         $prefix = 'INV-'.now()->format('Ymd').'-';
 
-        // Hanya hitung kode nota berformat angka. Kode lain (mis. hasil factory)
-        // tidak boleh merusak urutan karena pembandingan teks bersifat leksikografis.
         $last = Transaction::query()
             ->where('invoice_code', 'like', $prefix.'%')
-            ->whereRaw('invoice_code REGEXP ?', ['^'.preg_quote($prefix, '/').'[0-9]+$'])
-            ->orderByRaw('CAST(SUBSTRING(invoice_code, ?) AS UNSIGNED) DESC', [strlen($prefix) + 1])
+            ->where('invoice_code', 'not like', $prefix.'F%')
+            ->orderByDesc('invoice_code')
+            ->lockForUpdate()
             ->value('invoice_code');
 
         $sequence = $last === null ? 1 : ((int) substr($last, strlen($prefix))) + 1;
