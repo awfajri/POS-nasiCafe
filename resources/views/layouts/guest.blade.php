@@ -4,15 +4,20 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>@yield('title', config('app.name', 'NasiCafe POS'))</title>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @stack('styles')
     </head>
     <body class="font-sans antialiased bg-surface-light text-ink-primary">
         <div class="min-h-screen flex flex-col items-center justify-center p-6">
-            <div class="w-full max-w-md bg-surface-card p-8 rounded-2xl shadow-sm border border-surface-border">
+            <div class="w-full max-w-md bg-surface-card p-8 rounded-4xl shadow-sm border border-surface-border">
                 <div class="text-center mb-6">
-                    <a href="/" class="text-2xl font-bold text-brand-600">Nasi Cafe</a>
-                    <p class="text-xs text-ink-muted mt-1">Sistem Point of Sales & Self-Order</p>
+                    <p class="text-4xl font-bold text-ink-primary">NasiCafe</p>
+                    <p class="text-m text-ink-muted mt-1">Sistem Point of Sales & Self-Order</p>
                 </div>
 
                 <x-alert />
