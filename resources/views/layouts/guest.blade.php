@@ -16,8 +16,8 @@
         <div class="min-h-screen flex flex-col items-center justify-center p-6">
             <div class="w-full max-w-md bg-surface-card p-8 rounded-4xl shadow-sm border border-surface-border">
                 <div class="text-center mb-6">
-                    <p class="text-4xl font-bold text-ink-primary">NasiCafe</p>
-                    <p class="text-m text-ink-muted mt-1">Sistem Point of Sales & Self-Order</p>
+                    <p class="text-4xl font-bold text-ink-primary">Nasi Cafe</p>
+                    <p class="text-md text-ink-muted mt-1">Sistem Point of Sales & Self-Order</p>
                 </div>
 
                 <x-alert />
