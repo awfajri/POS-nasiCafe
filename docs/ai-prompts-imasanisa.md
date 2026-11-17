@@ -234,3 +234,9 @@ aturanya kayak gini
 - Commit mentah AI: chore: draft AI MenuRequest (belum direview)
 
 ### Hasil review dan perubahan oleh saya
+
+disini aku nemu 3 hal si yg diperbaiki
+
+1. Checkbox is_available yg ga dicentang ga dikirim browser, jadi aku tambahin prepareForValidation() supaya nilainya jadi true/false.
+2. price, stock, min_stock belum ada batas atas, padahal kolom unsignedInteger punya batas. sku tambahin max
+3. aku tambahin jg pesan image.uploaded dan pesan untuk batas max baru. terus aku jg uda ngecek upload_max_filesize di php.ini supaya file 2MB ga ditolak PHP lebih dulu.

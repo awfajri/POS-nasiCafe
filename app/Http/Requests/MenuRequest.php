@@ -6,37 +6,33 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class MenuRequest extends FormRequest
 {
-    /**
-     * Menentukan apakah pengguna diizinkan membuat request ini.
-     */
+    // role sudah dibatasi middleware route
     public function authorize(): bool
     {
-        return true; // Pembatasan role sudah ditangani oleh middleware route
+        return true;
     }
 
-    /**
-     * Aturan validasi yang diterapkan pada request ini.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
+    // checkbox yang gak dicentang ga dikirim browser, jadi dipaksa jadi true/false
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'is_available' => $this->boolean('is_available'),
+        ]);
+    }
+
     public function rules(): array
     {
         return [
             'category_id' => ['required', 'exists:categories,id'],
             'name' => ['required', 'string', 'max:150'],
-            'price' => ['required', 'integer', 'min:0'],
-            'stock' => ['required', 'integer', 'min:0'],
-            'min_stock' => ['required', 'integer', 'min:0'],
+            'price' => ['required', 'integer', 'min:0', 'max:10000000'],
+            'stock' => ['required', 'integer', 'min:0', 'max:100000'],
+            'min_stock' => ['required', 'integer', 'min:0', 'max:100000'],
             'is_available' => ['boolean'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }
 
-    /**
-     * Pesan validasi kustom berbahasa Indonesia untuk setiap field.
-     *
-     * @return array<string, string>
-     */
     public function messages(): array
     {
         return [
@@ -48,16 +44,20 @@ class MenuRequest extends FormRequest
             'price.required' => 'Harga menu wajib diisi.',
             'price.integer' => 'Harga menu harus berupa angka bulat.',
             'price.min' => 'Harga menu tidak boleh kurang dari 0.',
+            'price.max' => 'Harga menu terlalu besar.',
             'stock.required' => 'Stok menu wajib diisi.',
             'stock.integer' => 'Stok menu harus berupa angka bulat.',
             'stock.min' => 'Stok menu tidak boleh kurang dari 0.',
+            'stock.max' => 'Stok menu terlalu besar.',
             'min_stock.required' => 'Batas minimum stok wajib diisi.',
             'min_stock.integer' => 'Batas minimum stok harus berupa angka bulat.',
             'min_stock.min' => 'Batas minimum stok tidak boleh kurang dari 0.',
-            'is_available.boolean' => 'Status ketersediaan menu harus bernilai benar atau salah.',
+            'min_stock.max' => 'Batas minimum stok terlalu besar.',
+            'is_available.boolean' => 'Status ketersediaan menu tidak valid.',
             'image.image' => 'File yang diunggah harus berupa gambar.',
-            'image.mimes' => 'Format gambar harus berupa JPG, JPEG, PNG, atau WEBP.',
-            'image.max' => 'Ukuran file gambar tidak boleh melebihi 2MB.',
+            'image.mimes' => 'Format gambar harus JPG, JPEG, PNG, atau WEBP.',
+            'image.max' => 'Ukuran gambar tidak boleh melebihi 2MB.',
+            'image.uploaded' => 'Gambar gagal diunggah, pastikan ukurannya tidak lebih dari 2MB.',
         ];
     }
 }
