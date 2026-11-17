@@ -198,3 +198,39 @@ terus aturannya
 ### Hasil review dan perubahan oleh saya
 
 tadi pas review sempet nemu celah, name unik tapi slug dubuat dari name... jadi "Nasi Spesial" dan "Nasi-Spesial" lolos validasi nama tp bentrok di slug dab bikin error ke database. nah aku nambahin pengecekan slug gitu sih di rules name lewat closure, tapi mengabaikan kategori yg lagi diedit..
+
+---
+
+## Prompt 6 - MenuRequest
+
+- Tanggal: 17 November 2026
+- Branch: feature/master-request
+- Tool AI: Antigravity
+- Bagian yang diminta: Form Request untuk menu
+
+### Prompt yang dikirim
+
+Kkkey lanjut yaa, aku masi ngerjain proyek kelompok "NasiCafe POS" (Laravel 13, PHP 8.5, MySQL), modul Master Data. Branch: feature/master-request. Model Category dan Menu sudah ada.
+
+tugasnya buatin SATU file Form Request aja: app/Http/Requests/MenuRequest.php.
+
+aturanya kayak gini
+
+1. authorize() mengembalikan true (pembatasan role sudah ditangani middleware route).
+2. rules():
+    - category_id: required, exists:categories,id
+    - name: required, string, max:150
+    - price: required, integer, min:0
+    - stock: required, integer, min:0
+    - min_stock: required, integer, min:0
+    - is_available: boolean
+    - image: nullable, image, mimes:jpg,jpeg,png,webp, max:2048
+3. tambahinn messages() berbahasa Indonesia untuk semua field, termasuk pesan khusus untuk image (tipe file salah dan ukuran melebihi 2MB).
+4. Jangan membuat atau mengubah file lain. Komentar singkat berbahasa Indonesia seperlunya aja
+
+### Hasil
+
+- File dihasilkan: app/Http/Requests/MenuRequest.php
+- Commit mentah AI: chore: draft AI MenuRequest (belum direview)
+
+### Hasil review dan perubahan oleh saya
