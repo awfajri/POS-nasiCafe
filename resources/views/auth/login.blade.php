@@ -4,7 +4,6 @@
 
 @section('content')
     <div class="rounded-4xl border border-surface-border bg-surface-card p-5">
-        <x-alert />
 
         <form method="POST" action="{{ route('login.attempt') }}"
             x-data="{ show: false, loading: false }"
