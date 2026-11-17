@@ -165,3 +165,78 @@ aturan MenuFactory nya
 
 waktu review aku nemuin bug di CategoryFactory, slug dibuat dari variabel $name yg dipilih acak diawal, jadi kalo name di override (misalnya create(['name' => 'Minuman])), slug nya ga cocok dengan name. terus yauda aku perbaiki dengan ngejadiin name dan slug sebagai closure, jadi slug selalu dihitung dari name yg bener-bener dipakai. terus yg baris $name itu jadi mubazir, dan aku hapus, dan name acak ga lagi ngabisisn jatah unique() kalo di override. teruss unique() cuma punya 50 nama kategori, jadi seeder harus memberi category_id eksplisit kalo membuat banyak menu. yg Parameter ?int $stock di lowStock() adalah tambahan dari AI yg ga
 aku minta, tapi yauda aku biarin karena berguna untuk menu stok kritis.
+
+---
+
+## Prompt 5 - CategoryRequest
+
+- Tanggal: 17 November 2026
+- Branch: feature/master-request
+- Tool AI: Antigravity
+- Bagian yang diminta: Form Request untuk kategori
+
+### Prompt yang dikirim
+
+haloo, sekarang kita lanjut yaa, aku masi ngerjain proyek kelompok "NasiCafe POS" (Laravel 13, PHP 8.5, MySQL), modul Master Data. Branch: feature/master-request. Model Category dan Menu udah ada.
+
+tugasnya nanti kamu buatinn SATU file Form Request aja: app/Http/Requests/CategoryRequest.php.
+
+terus aturannya
+
+1. authorize() mengembalikan true (pembatasan role sudah ditangani middleware route).
+2. rules():
+    - name: required, string, max:100, unique di tabel categories kolom name. Saat update, abaikan id kategori yang sedang diedit (ambil dari route parameter 'category').
+    - description: nullable, string.
+3. Tambahkan messages() berbahasa Indonesia untuk name (required, unique, max).
+4. Jangan membuat atau mengubah file lain. Komentar singkat berbahasa Indonesia seperlunya aja yaa
+
+### Hasil
+
+- File dihasilkan: app/Http/Requests/CategoryRequest.php
+- Commit mentah AI: chore: draft AI CategoryRequest (belum direview)
+
+### Hasil review dan perubahan oleh saya
+
+tadi pas review sempet nemu celah, name unik tapi slug dubuat dari name... jadi "Nasi Spesial" dan "Nasi-Spesial" lolos validasi nama tp bentrok di slug dab bikin error ke database. nah aku nambahin pengecekan slug gitu sih di rules name lewat closure, tapi mengabaikan kategori yg lagi diedit..
+
+---
+
+## Prompt 6 - MenuRequest
+
+- Tanggal: 17 November 2026
+- Branch: feature/master-request
+- Tool AI: Antigravity
+- Bagian yang diminta: Form Request untuk menu
+
+### Prompt yang dikirim
+
+Kkkey lanjut yaa, aku masi ngerjain proyek kelompok "NasiCafe POS" (Laravel 13, PHP 8.5, MySQL), modul Master Data. Branch: feature/master-request. Model Category dan Menu sudah ada.
+
+tugasnya buatin SATU file Form Request aja: app/Http/Requests/MenuRequest.php.
+
+aturanya kayak gini
+
+1. authorize() mengembalikan true (pembatasan role sudah ditangani middleware route).
+2. rules():
+    - category_id: required, exists:categories,id
+    - name: required, string, max:150
+    - price: required, integer, min:0
+    - stock: required, integer, min:0
+    - min_stock: required, integer, min:0
+    - is_available: boolean
+    - image: nullable, image, mimes:jpg,jpeg,png,webp, max:2048
+3. tambahinn messages() berbahasa Indonesia untuk semua field, termasuk pesan khusus untuk image (tipe file salah dan ukuran melebihi 2MB).
+4. Jangan membuat atau mengubah file lain. Komentar singkat berbahasa Indonesia seperlunya aja
+
+### Hasil
+
+- File dihasilkan: app/Http/Requests/MenuRequest.php
+- Commit mentah AI: chore: draft AI MenuRequest (belum direview)
+
+### Hasil review dan perubahan oleh saya
+
+disini aku nemu 3 hal si yg diperbaiki
+
+1. Checkbox is_available yg ga dicentang ga dikirim browser, jadi aku tambahin prepareForValidation() supaya nilainya jadi true/false.
+2. price, stock, min_stock belum ada batas atas, padahal kolom unsignedInteger punya batas. sku tambahin max
+3. aku tambahin jg pesan image.uploaded dan pesan untuk batas max baru. terus aku jg uda ngecek upload_max_filesize di php.ini supaya file 2MB ga ditolak PHP lebih dulu.
