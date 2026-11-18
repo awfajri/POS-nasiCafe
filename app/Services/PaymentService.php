@@ -2,111 +2,137 @@
 
 namespace App\Services;
 
+use App\Models\Transaction;
+use App\Models\TransactionDetail;
 use App\Models\TransactionPayment;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use InvalidArgumentException;
+use Illuminate\Validation\ValidationException;
 
 class PaymentService
 {
-    public function remainingItems($transaction): Collection
+    public function __construct(
+        protected ?TransactionService $transactionService = null
+    ) {}
+
+    /**
+     * Daftar detail item yang masih memiliki sisa porsi belum dibayar.
+     */
+    public function remainingItems(Transaction $transaction): Collection
     {
-        $transactionItems = method_exists($transaction, 'items')
-            ? $transaction->items
-            : ($transaction->items ?? collect());
+        return $transaction->details()
+            ->with('menu')
+            ->orderBy('id')
+            ->get()
+            ->map(function (TransactionDetail $detail): TransactionDetail {
+                $detail->remaining_subtotal = $detail->remaining_quantity * $detail->unit_price;
 
-        $payments = TransactionPayment::where('transaction_id', $transaction->id)->get();
-
-        $paidQtyMap = [];
-        foreach ($payments as $payment) {
-            foreach ($payment->paid_items_json ?? [] as $paidItem) {
-                $itemId = (int) ($paidItem['transaction_item_id'] ?? $paidItem['id'] ?? 0);
-                $qty = (int) ($paidItem['qty'] ?? $paidItem['quantity'] ?? 0);
-
-                if ($itemId > 0) {
-                    $paidQtyMap[$itemId] = ($paidQtyMap[$itemId] ?? 0) + $qty;
-                }
-            }
-        }
-
-        return collect($transactionItems)
-            ->map(function ($item) use ($paidQtyMap) {
-                $orderedQty = (int) ($item->qty ?? $item->quantity ?? 0);
-                $paidQty = $paidQtyMap[$item->id] ?? 0;
-                $remainingQty = max(0, $orderedQty - $paidQty);
-
-                $unitPrice = (int) ($item->price ?? $item->unit_price ?? (
-                    $orderedQty > 0 ? intdiv((int) ($item->subtotal ?? 0), $orderedQty) : 0
-                ));
-
-                $item->remaining_qty = $remainingQty;
-                $item->remaining_subtotal = $remainingQty * $unitPrice;
-
-                return $item;
+                return $detail;
             })
-            ->filter(fn ($item) => $item->remaining_qty > 0)
+            ->filter(fn (TransactionDetail $detail): bool => $detail->remaining_quantity > 0)
             ->values();
     }
 
+    /**
+     * Memproses pembayaran (penuh maupun split bill per item).
+     *
+     * @param  array<int, array{detail_id: int|string, qty: int|string}>  $items
+     */
     public function pay(
-        $transaction,
+        Transaction $transaction,
         array $items,
         string $method,
         User $cashier,
         ?int $cashReceived = null,
         ?string $payerName = null
-    ) {
+    ): TransactionPayment {
         if (! in_array($method, ['cash', 'qris'], true)) {
-            throw new InvalidArgumentException('Metode pembayaran harus cash atau qris.');
+            throw ValidationException::withMessages([
+                'payment_method' => 'Metode pembayaran harus cash atau qris.',
+            ]);
         }
 
-        if (empty($items)) {
-            throw new InvalidArgumentException('Minimal harus ada 1 item yang dibayar.');
+        $mergedItems = [];
+        foreach ($items as $item) {
+            $detailId = (int) ($item['detail_id'] ?? 0);
+            $qty = (int) ($item['qty'] ?? 0);
+
+            if ($detailId < 1 || $qty < 1) {
+                throw ValidationException::withMessages([
+                    'items' => 'Item pembayaran dan jumlah porsi harus valid.',
+                ]);
+            }
+
+            $mergedItems[$detailId] = ($mergedItems[$detailId] ?? 0) + $qty;
         }
 
-        return DB::transaction(function () use ($transaction, $items, $method, $cashier, $cashReceived, $payerName) {
-            $remainingMap = $this->remainingItems($transaction)->keyBy('id');
-            $normalizedItems = [];
+        if ($mergedItems === []) {
+            throw ValidationException::withMessages([
+                'items' => 'Minimal harus ada 1 item yang dibayar.',
+            ]);
+        }
+
+        return DB::transaction(function () use ($transaction, $mergedItems, $method, $cashier, $cashReceived, $payerName): TransactionPayment {
+            $lockedTransaction = Transaction::query()
+                ->lockForUpdate()
+                ->findOrFail($transaction->getKey());
+
+            if (! $lockedTransaction->canBePaid()) {
+                throw ValidationException::withMessages([
+                    'transaction' => 'Transaksi ini sudah lunas atau tidak dapat dibayar.',
+                ]);
+            }
+
+            $lockedDetails = $lockedTransaction->details()
+                ->with('menu')
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('id');
+
+            $paidItemsJson = [];
             $amountPaid = 0;
 
-            foreach ($items as $item) {
-                $itemId = (int) ($item['transaction_item_id'] ?? $item['id'] ?? 0);
-                $qty = (int) ($item['qty'] ?? $item['quantity'] ?? 0);
+            foreach ($mergedItems as $detailId => $qty) {
+                /** @var TransactionDetail|null $detail */
+                $detail = $lockedDetails->get($detailId);
 
-                if ($itemId <= 0 || $qty <= 0) {
-                    throw new InvalidArgumentException('Item pembayaran dan jumlah qty harus valid.');
+                if (! $detail) {
+                    throw ValidationException::withMessages([
+                        'items' => "Detail item #{$detailId} tidak ditemukan pada transaksi ini.",
+                    ]);
                 }
 
-                $remainingItem = $remainingMap->get($itemId);
-                if ($remainingItem && $qty > $remainingItem->remaining_qty) {
-                    throw new InvalidArgumentException("Jumlah qty item #{$itemId} melebihi sisa yang belum dibayar.");
+                $menuName = $detail->menu?->name ?? "Menu #{$detail->menu_id}";
+                $remainingQty = $detail->remaining_quantity;
+
+                if ($qty > $remainingQty) {
+                    throw ValidationException::withMessages([
+                        'items' => "Jumlah porsi {$menuName} melebihi sisa yang belum dibayar (sisa: {$remainingQty}).",
+                    ]);
                 }
 
-                if (isset($item['subtotal'])) {
-                    $subtotal = (int) $item['subtotal'];
-                } elseif ($remainingItem) {
-                    $unitPrice = (int) ($remainingItem->price ?? $remainingItem->unit_price ?? 0);
-                    $subtotal = $unitPrice * $qty;
-                } else {
-                    $subtotal = (int) ($item['price'] ?? 0) * $qty;
-                }
+                $subtotal = $detail->unit_price * $qty;
+
+                $detail->update([
+                    'paid_quantity' => $detail->paid_quantity + $qty,
+                ]);
 
                 $amountPaid += $subtotal;
-                $normalizedItems[] = [
-                    'transaction_item_id' => $itemId,
+                $paidItemsJson[] = [
+                    'detail_id' => $detail->id,
+                    'menu_name' => $menuName,
                     'qty' => $qty,
                     'subtotal' => $subtotal,
                 ];
             }
 
-            if ($amountPaid <= 0) {
-                throw new InvalidArgumentException('Nominal pembayaran harus lebih dari Rp 0.');
-            }
-
             if ($method === 'cash') {
                 if ($cashReceived === null || $cashReceived < $amountPaid) {
-                    throw new InvalidArgumentException('Uang tunai yang diterima kurang dari nominal pembayaran.');
+                    throw ValidationException::withMessages([
+                        'cash_received' => 'Uang tunai yang diterima kurang dari nominal tagihan (Rp ' . number_format($amountPaid, 0, ',', '.') . ').',
+                    ]);
                 }
 
                 $changeAmount = $cashReceived - $amountPaid;
@@ -116,46 +142,59 @@ class PaymentService
             }
 
             $payment = TransactionPayment::create([
-                'transaction_id' => $transaction->id,
+                'transaction_id' => $lockedTransaction->id,
                 'cashier_id' => $cashier->id,
                 'payer_name' => $payerName,
                 'payment_method' => $method,
                 'amount_paid' => $amountPaid,
                 'cash_received' => $cashReceived,
                 'change_amount' => $changeAmount,
-                'paid_items_json' => $normalizedItems,
+                'paid_items_json' => $paidItemsJson,
             ]);
 
-            if ($this->remainingItems($transaction)->isEmpty()) {
-                $attributes = $transaction->getAttributes();
-                if (array_key_exists('status', $attributes)) {
-                    $transaction->update(['status' => 'paid']);
-                } elseif (array_key_exists('payment_status', $attributes)) {
-                    $transaction->update(['payment_status' => 'paid']);
-                }
+            $newPaidAmount = $lockedTransaction->paid_amount + $amountPaid;
+            $allDetailsPaid = $lockedDetails->every(
+                fn (TransactionDetail $detail): bool => $detail->paid_quantity >= $detail->quantity
+            );
+            $isFullyPaid = $allDetailsPaid || $newPaidAmount >= $lockedTransaction->total_amount;
+
+            $lockedTransaction->update([
+                'paid_amount' => $newPaidAmount,
+                'payment_status' => $isFullyPaid
+                    ? Transaction::PAYMENT_PAID
+                    : Transaction::PAYMENT_PARTIAL,
+            ]);
+
+            if ($lockedTransaction->status === Transaction::STATUS_PENDING) {
+                $txService = $this->transactionService ?? app(TransactionService::class);
+                $txService->moveToProcessing($lockedTransaction, $cashier);
             }
 
             return $payment;
         });
     }
 
+    /**
+     * Melunasi seluruh sisa item yang belum dibayar pada transaksi.
+     */
     public function payRemaining(
-        $transaction,
+        Transaction $transaction,
         string $method,
         User $cashier,
         ?int $cashReceived = null,
         ?string $payerName = null
-    ) {
+    ): TransactionPayment {
         $remainingItems = $this->remainingItems($transaction);
 
         if ($remainingItems->isEmpty()) {
-            throw new InvalidArgumentException('Tidak ada sisa item yang perlu dibayar.');
+            throw ValidationException::withMessages([
+                'items' => 'Tidak ada sisa item yang perlu dibayar.',
+            ]);
         }
 
-        $itemsPayload = $remainingItems->map(fn ($item) => [
-            'transaction_item_id' => $item->id,
-            'qty' => $item->remaining_qty,
-            'subtotal' => $item->remaining_subtotal,
+        $itemsPayload = $remainingItems->map(fn (TransactionDetail $detail): array => [
+            'detail_id' => $detail->id,
+            'qty' => $detail->remaining_quantity,
         ])->all();
 
         return $this->pay($transaction, $itemsPayload, $method, $cashier, $cashReceived, $payerName);
