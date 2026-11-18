@@ -8,20 +8,20 @@ class ProcessPaymentRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return (bool) $this->user()?->isCashier();
     }
 
     public function rules(): array
     {
+        $isSplitRoute = $this->routeIs('payments.pay-split');
+
         return [
             'payer_name' => ['nullable', 'string', 'max:100'],
             'payment_method' => ['required', 'string', 'in:cash,qris'],
-            'amount_paid' => ['required', 'integer', 'min:1'],
-            'cash_received' => ['nullable', 'required_if:payment_method,cash', 'integer', 'gte:amount_paid'],
-            'paid_items' => ['required', 'array', 'min:1'],
-            'paid_items.*.transaction_item_id' => ['required', 'integer', 'min:1'],
-            'paid_items.*.qty' => ['required', 'integer', 'min:1'],
-            'paid_items.*.subtotal' => ['required', 'integer', 'min:0'],
+            'cash_received' => ['nullable', 'required_if:payment_method,cash', 'integer', 'min:0'],
+            'items' => [$isSplitRoute ? 'required' : 'nullable', 'array', 'min:1'],
+            'items.*.detail_id' => ['required', 'integer', 'min:1'],
+            'items.*.qty' => ['required', 'integer', 'min:1'],
         ];
     }
 
@@ -30,12 +30,14 @@ class ProcessPaymentRequest extends FormRequest
         return [
             'payment_method.required' => 'Metode pembayaran wajib dipilih.',
             'payment_method.in' => 'Metode pembayaran harus cash atau qris.',
-            'amount_paid.required' => 'Nominal pembayaran wajib diisi.',
-            'amount_paid.min' => 'Nominal pembayaran minimal Rp 1.',
             'cash_received.required_if' => 'Nominal uang tunai diterima wajib diisi untuk pembayaran cash.',
-            'cash_received.gte' => 'Uang tunai yang diterima tidak boleh kurang dari nominal tagihan.',
-            'paid_items.required' => 'Minimal harus ada 1 item yang dibayar.',
-            'paid_items.min' => 'Minimal harus ada 1 item yang dibayar.',
+            'cash_received.integer' => 'Nominal uang tunai harus berupa angka bulat.',
+            'cash_received.min' => 'Nominal uang tunai tidak valid.',
+            'items.required' => 'Minimal harus ada 1 item yang dipilih untuk split bill.',
+            'items.min' => 'Minimal harus ada 1 item yang dipilih untuk split bill.',
+            'items.*.detail_id.required' => 'ID detail item wajib diisi.',
+            'items.*.qty.required' => 'Jumlah porsi item wajib diisi.',
+            'items.*.qty.min' => 'Jumlah porsi minimal 1.',
         ];
     }
 }
