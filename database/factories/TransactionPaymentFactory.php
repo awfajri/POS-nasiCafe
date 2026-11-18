@@ -31,7 +31,8 @@ class TransactionPaymentFactory extends Factory
             'change_amount' => $changeAmount,
             'paid_items_json' => [
                 [
-                    'transaction_item_id' => 1,
+                    'detail_id' => 1,
+                    'menu_name' => fake()->words(2, true),
                     'qty' => 1,
                     'subtotal' => $amountPaid,
                 ],
