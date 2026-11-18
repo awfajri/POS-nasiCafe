@@ -40,16 +40,16 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($accounts as $account) {
-            User::query()->updateOrCreate(
-                ['email' => $account['email']],
-                [
-                    'name' => $account['name'],
-                    'password' => $account['password'],
-                    'role' => $account['role'], // diset eksplisit, bukan fillable
-                    'is_active' => true,
-                    'email_verified_at' => now(),
-                ],
-            );
+            $user = User::query()->firstOrNew([
+                    'email' => $account['email']
+                ]);
+            $user->name = $account['name'];
+            $user->password = $account['password'];
+            $user->role = $account['role'];
+            $user->is_active = true;
+            $user->email_verified_at = now();
+
+            $user->save();
         }
 
         // 3–5 pelanggan dummy (role customer).
@@ -61,16 +61,16 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($customers as $customer) {
-            User::query()->updateOrCreate(
-                ['email' => $customer['email']],
-                [
-                    'name' => $customer['name'],
-                    'password' => $password,
-                    'role' => User::ROLE_CUSTOMER,
-                    'is_active' => true,
-                    'email_verified_at' => now(),
-                ],
-            );
+            $user = User::query()->firstOrNew([
+                'email' => $customer['email']
+            ]);
+            $user->name = $customer['name'];
+            $user->password = $password;
+            $user->role = User::ROLE_CUSTOMER;
+            $user->is_active = true;
+            $user->email_verified_at = now();
+
+            $user->save();
         }
     }
 }
