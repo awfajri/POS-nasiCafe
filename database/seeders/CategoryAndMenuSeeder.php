@@ -28,7 +28,7 @@ class CategoryAndMenuSeeder extends Seeder
         $categoryIds = [];
 
         foreach ($categories as $data) {
-            $category = Category::query()->firstOrNew(
+            $category = Category::query()->updateOrCreate(
                 ['slug' => Str::slug($data['name'])],
                 [
                     'name' => $data['name'],
@@ -62,7 +62,7 @@ class CategoryAndMenuSeeder extends Seeder
         ];
 
         foreach ($menus as [$name, $categoryName, $price, $stock, $minStock]) {
-            Menu::query()->firstOrNew(
+            Menu::query()->updateOrCreate(
                 ['name' => $name],
                 [
                     'category_id' => $categoryIds[$categoryName],
