@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                                Showing [6] routes
+                                                                      Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,7 +299,7 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                                Showing [7] routes
+                                                                      Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
 
@@ -314,3 +314,43 @@ Pengecekan yang aku lakukan:
 Perubahan kode: tidak ada, karena prompt ini cuma kerangka tanpa logika dan hasilnya sudah sesuai kontrak.
 
 Yang aku pelajari: validasi FormRequest dan route model binding jalan sebelum isi method, jadi buka edit dengan ID yang tidak ada hasilnya 404, bukan 501.
+
+---
+
+## Prompt 8 - CategoryController
+
+- Tanggal: 20 November 2026
+- Branch: feature/master-crud
+- Tool AI: Antigravity (model Gemini 3.8 Flash)
+- Bagian yang diminta: isi method CategoryController (index, create, store, edit, update, destroy)
+- Catatan: prompt disusun dengan bantuan Claude
+
+### Prompt yang dikirim
+
+kkey masi lanjut ya proyek Laravel 13 (PHP 8.5, MySQL) bernama NasiCafe POS, modul Master Data untuk role Owner. File app/Http/Controllers/CategoryController.php sudah ada berisi kerangka dengan 6 method yang isinya abort(501). Model Category (fillable: name, slug, description; relasi menus() hasMany) dan CategoryRequest (field name dan description) sudah ada. Ini bagian kedua Fase 2: HANYA mengisi CategoryController.
+
+TUGASNYAA  
+Ganti isi method di app/Http/Controllers/CategoryController.php. Pertahankan nama method, type hint, dan import yang sudah ada.
+
+1. index(): ambil kategori dengan withCount('menus'), urut berdasarkan name, paginate(10). Return view('owner.categories.index', compact('categories')).
+2. create(): return view('owner.categories.form', ['category' => null]).
+3. store(CategoryRequest $request): ambil data dari $request->validated(). Buat slug dari name memakai Str::slug(). Simpan dengan Category::create(). Redirect ke route('owner.categories.index') dengan flash 'success' => 'Kategori berhasil ditambahkan.'
+4. edit(Category $category): return view('owner.categories.form', compact('category')).
+5. update(CategoryRequest $request, Category $category): ambil data dari $request->validated(), perbarui slug dari name baru memakai Str::slug(), lalu $category->update(). Redirect ke route('owner.categories.index') dengan flash 'success' => 'Kategori berhasil diperbarui.'
+6. destroy(Category $category): jika $category->menus()->exists(), lempar ValidationException::withMessages(['category' => 'Kategori tidak dapat dihapus karena masih memiliki menu.']). Jika tidak, hapus kategori lalu redirect ke route('owner.categories.index') dengan flash 'success' => 'Kategori berhasil dihapus.'
+
+ATURAN
+
+- Gunakan hanya $request->validated(). JANGAN pernah memakai $request->all().
+- Tambahkan import yang dibutuhkan (Illuminate\Support\Str dan Illuminate\Validation\ValidationException) di atas file.
+- Error bisnis dilempar sebagai ValidationException::withMessages, tanpa try/catch.
+- JANGAN membuat view (view dibuat di prompt lain). JANGAN mengubah route, model, request, migration, atau file lain. JANGAN menambah method di luar 6 method di atas. JANGAN menjalankan perintah terminal.
+
+### Hasil
+
+- File yang berubah: app/Http/Controllers/CategoryController.php (dan docs)
+- Antigravity mengisi 6 method: index, create, store, edit, update, destroy
+- Tidak ada file lain yang berubah, tidak ada perintah terminal yang dijalankan
+- Commit mentah AI: chore: draft AI CategoryController (belum direview)
+
+### Hasil review dan perubahan oleh saya
