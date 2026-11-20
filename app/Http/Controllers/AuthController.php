@@ -23,7 +23,7 @@ class AuthController extends Controller
         // seperti sandi salah, jadi status akun tidak bocor.
         $credentials = $request->validated() + ['is_active' => true];
 
-        if (! Auth::attempt($credentials)) {
+        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()
                 ->withInput($request->only('email'))
                 ->with('error', 'Email atau kata sandi salah, atau akun nonaktif');
