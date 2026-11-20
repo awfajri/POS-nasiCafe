@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                    Showing [6] routes
+                                                                Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,8 +299,18 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                    Showing [7] routes
-
-- Commit mentah AI: chore: draft AI routes master dan stub controller (belum direview)
+                                                                Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
+
+Aku baca routes/master.php dan kedua controller baris per baris, lalu cocokkan dengan kontrak. Grup middleware auth + role:owner, prefix owner, resource categories dan menus tanpa show, route PATCH menus/{menu}/stock bernama owner.menus.stock, serta signature dan type hint semua method sudah sesuai. Semua method isinya cuma abort(501), tidak ada logika tambahan.
+
+Pengecekan yang aku lakukan:
+
+- php artisan route:list --name=owner -v menampilkan 13 route, semuanya punya middleware auth dan role:owner.
+- Lewat git diff aku lihat satu-satunya baris yang dihapus dari master.php adalah komentar bawaan "Route Data Master Kategori & Menu", jadi tidak ada logika yang hilang.
+- Tes browser: login kasir buka /owner/menus muncul 403. Login owner buka /owner/categories dan /owner/menus muncul 501 "Belum diimplementasi" (di halaman error terlihat request sampai CategoryController@index lewat RoleMiddleware). /owner/menus/9999/edit muncul 404.
+
+Perubahan kode: tidak ada, karena prompt ini cuma kerangka tanpa logika dan hasilnya sudah sesuai kontrak.
+
+Yang aku pelajari: validasi FormRequest dan route model binding jalan sebelum isi method, jadi buka edit dengan ID yang tidak ada hasilnya 404, bukan 501.
