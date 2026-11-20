@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                                      Showing [6] routes
+                                                                              Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,7 +299,7 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                                      Showing [7] routes
+                                                                              Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
 
@@ -354,3 +354,11 @@ ATURAN
 - Commit mentah AI: chore: draft AI CategoryController (belum direview)
 
 ### Hasil review dan perubahan oleh saya
+
+### Hasil review dan perubahan oleh saya
+
+Yang aku cek: risiko slug kembar (misalnya "Nasi Spesial!" dan "Nasi Spesial" sama-sama jadi nasi-spesial, padahal kolom slug unique). Lewat tinker, Validator dengan aturan CategoryRequest menolak "Nasi Spesial!" dengan pesan "Nama kategori terlalu mirip dengan kategori lain.", jadi pencegahan dari Fase 1 udah menutup kasusnya dan store tidak akan error 500.
+
+Perubahan kode: aku menambahkan komentar penjelasan berbahasa Indonesia di tiap method CategoryController supaya aku paham alurnya. Logikanya tidak aku ubah karena hasilnya sudah sesuai kontrak dan risiko slug kembar sudah tertutup di request.
+
+Yang belum bisa dites sekarang: halaman index dan form (view dibuat di Prompt 14 dan 15), pesan error destroy yang harus ditampilkan view lewat $errors->first('category'), dan edit tanpa ganti nama harus tetap berhasil. Itu aku tes di browser setelah view jadi.
