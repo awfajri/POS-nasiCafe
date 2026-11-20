@@ -240,3 +240,67 @@ disini aku nemu 3 hal si yg diperbaiki
 1. Checkbox is_available yg ga dicentang ga dikirim browser, jadi aku tambahin prepareForValidation() supaya nilainya jadi true/false.
 2. price, stock, min_stock belum ada batas atas, padahal kolom unsignedInteger punya batas. sku tambahin max
 3. aku tambahin jg pesan image.uploaded dan pesan untuk batas max baru. terus aku jg uda ngecek upload_max_filesize di php.ini supaya file 2MB ga ditolak PHP lebih dulu.
+
+---
+
+## Prompt 7 - Routes Master dan stub controller
+
+- Tanggal: 20 November 2026
+- Branch: feature/master-crud
+- Tool AI: Antigravity
+- Bagian yang diminta: routes/master.php (13 route master Owner) dan kerangka CategoryController serta MenuController (isi method masih abort 501)
+
+### Prompt yang dikirim
+
+haloo, kita lanjut lagi yaa ngerjain KONTEKS proyek Laravel 13 (PHP 8 5, MySQL) bernama NasiCafe POS. Saya mengerjakan modul Master Data (Kategori dan Menu) untuk role Owner. Fase 1 (migration, model, factory, Form Request CategoryRequest dan MenuRequest) sudah selesai. Sekarang Fase 2: routes dan controller. Ini bagian pertama: HANYA routes dan kerangka (stub) controller.
+
+TUGAS
+
+1. Isi file routes/master.php (file sudah ada dan kosong; sudah di-require oleh routes/web.php, JANGAN edit web.php).
+2. Buat dua controller kerangka: app/Http/Controllers/CategoryController.php dan app/Http/Controllers/MenuController.php. Sebelum membuat, lihat folder app/Http/Controllers dan ikuti konvensi namespace yang sudah dipakai di sana.
+
+ATURAN ROUTE
+
+- Semua route dalam satu grup: Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->group(...)
+- Route::resource('categories', CategoryController::class)->except('show') (nama route: owner.categories.index, create, store, edit, update, destroy)
+- Route::resource('menus', MenuController::class)->except('show') (nama route: owner.menus.\*)
+- Route::patch('menus/{menu}/stock', [MenuController::class, 'updateStock'])->name('menus.stock') (nama lengkap: owner.menus.stock)
+- Gunakan import "use" di atas file, bukan nama class lengkap di dalam grup.
+- Jangan membuat route di luar daftar di atas.
+
+ATURAN CONTROLLER (STUB SAJA)
+
+- CategoryController: method index(), create(), store(CategoryRequest $request), edit(Category $category), update(CategoryRequest $request, Category $category), destroy(Category $category).
+- MenuController: method index(Request $request), create(), store(MenuRequest $request), edit(Menu $menu), update(MenuRequest $request, Menu $menu), destroy(Menu $menu), updateStock(Request $request, Menu $menu).
+- Isi setiap method HANYA: abort(501, 'Belum diimplementasi');
+- Pasang type hint dan import (use) yang benar untuk Request, CategoryRequest, MenuRequest, Category, Menu. Return type tidak perlu.
+- JANGAN menulis logika apa pun (validasi, query, upload, slug, stok). JANGAN membuat view. JANGAN mengubah file lain (termasuk routes/web.php, model, request, migration). JANGAN menjalankan perintah terminal.
+
+### Hasil
+
+- File dihasilkan: routes/master.php, app/Http/Controllers/CategoryController.php, app/Http/Controllers/MenuController.php
+- route:list menampilkan:
+  route:list --name=owner.categories
+  GET|HEAD owner/categories owner.categories.index › Categor…
+  POST owner/categories owner.categories.store › Categor…
+  GET|HEAD owner/categories/create owner.categories.create …
+  PUT|PATCH owner/categories/{category} owner.categories.upda…
+  DELETE owner/categories/{category} owner.categories.dest…
+  GET|HEAD owner/categories/{category}/edit owner.categories…
+
+                                                    Showing [6] routes
+
+    route:list --name=owner.menus
+    GET|HEAD owner/menus owner.menus.index › MenuController@in…
+    POST owner/menus owner.menus.store › MenuController@st…
+    GET|HEAD owner/menus/create owner.menus.create › MenuContr…
+    PUT|PATCH owner/menus/{menu} owner.menus.update › MenuContr…
+    DELETE owner/menus/{menu} owner.menus.destroy › MenuCont…
+    GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
+    PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
+
+                                                    Showing [7] routes
+
+- Commit mentah AI: chore: draft AI routes master dan stub controller (belum direview)
+
+### Hasil review dan perubahan oleh saya
