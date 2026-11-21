@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                                                                  Showing [6] routes
+                                                                                                        Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,7 +299,7 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                                                                  Showing [7] routes
+                                                                                                        Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
 
@@ -399,3 +399,14 @@ ATURAN
 - Commit mentah AI: chore: draft AI MenuController index create edit (belum direview)
 
 ### Hasil review dan perubahan oleh saya
+
+Yg aku perbaiki di index:
+
+1. Pencarian: waktu kutes lewat tinker dengan ?search[]=a di kode asli, muncul WARNING "Array to string conversion" di baris 17, jadi array dipaksa jadi teks "Array" lalu dipakai di LIKE. aku tambah pengecekan is_string. Setelah perbaikan, warning itu hilang dan hanya muncul "View not found" karena view belum dibuat.
+2. Karakter % dan \_ di pencarian berfungsi sebagai wildcard LIKE. Tesnya: "%" tanpa escape mencocokkan 14 menu (semua), setelah di-escape dengan addcslashes hasilnya 0. Jadi aku beri escape supaya dianggap huruf biasa.
+3. category_id dari URL kuubah jadi $request->integer('category_id') supaya selalu angka.
+4. aku tambah komentar penjelasan di tiap method supaya aku paham alurnya.
+
+Yang kubiarkan: gada Form Request khusus untuk filter, karena filter GET sederhana cukup ditangani di controller.
+
+Yang belum dites: halaman index, filter, dan paginasi di browser, menunggu view di Prompt 16.
