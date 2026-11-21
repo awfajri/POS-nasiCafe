@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                                                                                            Showing [6] routes
+                                                                                                                                    Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,7 +299,7 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                                                                                            Showing [7] routes
+                                                                                                                                    Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
 
@@ -493,3 +493,32 @@ Yg aku perbaiki:
 Tes update normal lewat tinker (setelah perbaikan): foto lama terhapus, folder menus hanya berisi foto baru, dan image_path berisi path foto baru. Jadi perbaikan tidak merusak update yang berhasil.
 
 Yang belum dites: edit lewat form dan foto tampil di browser, menunggu view di Prompt 17.
+
+---
+
+## Prompt 12 - MenuController destroy
+
+- Tanggal: 21 November 2026
+- Branch: feature/master-crud
+- Tool AI: Antigravity (model Gemini 3.8 Flash)
+- Bagian yang diminta: isi method destroy di MenuController
+
+### Prompt yang dikirim
+
+Lanjut ya, aku masih ngerjain modul Master Data proyek "NasiCafe POS" (Laravel 13, PHP 8.5, MySQL), branch feature/master-crud. MenuController sudah punya index, create, store, edit, dan update yang terisi. Sekarang tugasnya HANYA mengisi method destroy di app/Http/Controllers/MenuController.php.
+
+Aturannya begini:
+
+1. Sebelum menulis, liat app/Models/Menu.php untuk mencari nama relasi hasMany ke TransactionDetail (menu_id), lalu pakai relasi itu. Jangan mengarang nama relasi.
+2. Kalau menu pernah dipakai di transaction_details (cek lewat relasi itu dengan exists()), tolak dengan melempar ValidationException::withMessages(['menu' => 'Menu tidak dapat dihapus karena sudah pernah dipakai dalam transaksi. Nonaktifkan menu (is_available) sebagai gantinya.']). Jangan pakai try/catch untuk error bisnis ini.
+3. Kalau belum pernah dipakai, hapus foto menu dari disk public dengan Storage::disk('public')->delete(...) (hanya kalau image_path tidak kosong) dan hapus data menunya dengan $menu->delete().
+4. Redirect ke route('owner.menus.index') dengan flash 'success' => 'Menu berhasil dihapus.'
+5. Method lain (index, create, store, edit, update, updateStock) jangan diubah, dan jangan hapus komentar yang sudah ada.
+6. Jangan membuat atau mengubah file lain (termasuk model). Jangan menjalankan perintah terminal. Komentar singkat berbahasa Indonesia seperlunya.
+
+### Hasil
+
+- File dihasilkan: app/Http/Controllers/MenuController.php (method destroy)
+- Commit mentah AI: chore: draft AI MenuController destroy (belum direview)
+
+### Hasil review dan perubahan oleh saya

@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Menu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class MenuController extends Controller
@@ -144,7 +145,23 @@ class MenuController extends Controller
     // Prompt 12
     public function destroy(Menu $menu)
     {
-        abort(501, 'Belum diimplementasi');
+        // Cegah penghapusan jika menu sudah pernah tercatat dalam transaksi
+        if ($menu->transactionDetails()->exists()) {
+            throw ValidationException::withMessages([
+                'menu' => 'Menu tidak dapat dihapus karena sudah pernah dipakai dalam transaksi. Nonaktifkan menu (is_available) sebagai gantinya.',
+            ]);
+        }
+
+        // Hapus file foto dari storage public jika ada
+        if ($menu->image_path) {
+            Storage::disk('public')->delete($menu->image_path);
+        }
+
+        $menu->delete();
+
+        return redirect()
+            ->route('owner.menus.index')
+            ->with('success', 'Menu berhasil dihapus.');
     }
 
     // Prompt 13
