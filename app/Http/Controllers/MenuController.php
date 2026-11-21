@@ -6,6 +6,8 @@ use App\Http\Requests\MenuRequest;
 use App\Models\Category;
 use App\Models\Menu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class MenuController extends Controller
 {
@@ -58,20 +60,33 @@ class MenuController extends Controller
         ]);
     }
 
-    // Prompt 10
+    // Menyimpan menu baru
     public function store(MenuRequest $request)
     {
+        // validated() hanya berisi field yang lolos aturan MenuRequest
         $data = $request->validated();
 
-        // Simpan gambar jika ada file yang diunggah
-        if ($request->hasFile('image')) {
-            $data['image_path'] = $request->file('image')->store('menus', 'public');
-        }
-
-        // Hapus key 'image' karena kolom di database bernama image_path
+        // 'image' (objek file) bukan kolom database, jadi dibuang dari data
         unset($data['image']);
 
-        Menu::create($data);
+        // Simpan foto ke disk public dengan nama acak, kalau ada file yang diunggah
+        $path = null;
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('menus', 'public');
+            $data['image_path'] = $path;
+        }
+
+        try {
+            Menu::create($data);
+        } catch (Throwable $e) {
+            // Kalau simpan ke database gagal, hapus foto yang sudah terlanjur tersimpan
+            // supaya tidak ada file yatim, lalu lempar ulang errornya
+            if ($path) {
+                Storage::disk('public')->delete($path);
+            }
+
+            throw $e;
+        }
 
         return redirect()
             ->route('owner.menus.index')

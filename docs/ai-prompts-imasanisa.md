@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                                                                              Showing [6] routes
+                                                                                                                  Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,7 +299,7 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                                                                              Showing [7] routes
+                                                                                                                  Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
 
@@ -440,3 +440,14 @@ Aturannya kyk gini:
 - Commit mentah AI: chore: draft AI MenuController store (belum direview)
 
 ### Hasil review dan perubahan oleh saya
+
+Yg aku perbaiki:
+
+1. Foto disimpan sebelum Menu::create, jadi kalo create gagal fotonya tertinggal tanpa pemilik. pas aku tes lewat tinker (Storage::fake, create dipaksa gagal), di kode asli muncul pesan "gagal" tapi 1 file foto masih tertinggal di folder menus. aku tambah try/catch yang menghapus foto lalu melempar ulang errornya. Setelah perbaikan, pesan "gagal" tetap muncul tapi daftar file di folder menus kosong.
+2. aku tambahin komentar penjelasan di store.
+
+Catatan: try/catch ini cuma membersihkan file lalu melempar ulang error yang sama, bukan menangani error bisnis, jadi ga bertentangan dengan aturan kontrak.
+
+Tes simpan normal lewat tinker: file tersimpan dengan nama acak, image_path terisi, is_available true (sebelum dan sesudah perbaikan).
+
+Yg belum dites: simpan lewat form dan foto tampil di browser, menunggu view di Prompt 17.
