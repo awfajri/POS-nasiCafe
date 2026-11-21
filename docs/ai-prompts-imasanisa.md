@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                                                                        Showing [6] routes
+                                                                                                              Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,7 +299,7 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                                                                        Showing [7] routes
+                                                                                                              Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
 
@@ -410,3 +410,33 @@ Yg aku perbaiki di index:
 Yang kubiarkan: gada Form Request khusus untuk filter, karena filter GET sederhana cukup ditangani di controller.
 
 Yang belum dites: halaman index, filter, dan paginasi di browser, menunggu view di Prompt 16.
+
+---
+
+## Prompt 10 - MenuController store
+
+- Tanggal: 21 November 2026
+- Branch: feature/master-crud
+- Tool AI: Antigravity (model Gemini 3.8 Flash)
+- Bagian yang diminta: isi method store di MenuController
+
+### Prompt yang dikirim
+
+Lanjut ya, aku masih ngerjain modul Master Data proyek "NasiCafe POS" (Laravel 13, PHP 8.5, MySQL), branch feature/master-crud. MenuController sudah ada, method index, create, dan edit sudah terisi. Sekarang tugasnya HANYA mengisi method store di app/Http/Controllers/MenuController.php.
+
+Aturannya kyk gini:
+
+1. Ambil data dari $request->validated(). Jangan pernah pakai $request->all().
+2. Kalau ada file gambar ($request->hasFile('image')), simpan dengan $request->file('image')->store('menus', 'public'), lalu isi $data['image_path'] dengan path hasilnya. Nama file otomatis acak dari Laravel, jangan pakai nama asli file.
+3. Hapus key 'image' dari $data sebelum disimpan, karena kolom di database bernama image_path, bukan image.
+4. Simpan dengan Menu::create($data).
+5. Redirect ke route('owner.menus.index') dengan flash 'success' => 'Menu berhasil ditambahkan.'
+6. Method lain (index, create, edit, update, destroy, updateStock) jangan diubah, dan jangan hapus komentar yang sudah ada.
+7. Jangan membuat atau mengubah file lain. Jangan menjalankan perintah terminal. Komentar singkat berbahasa Indonesia seperlunya.
+
+### Hasil
+
+- File dihasilkan: app/Http/Controllers/MenuController.php (method store)
+- Commit mentah AI: chore: draft AI MenuController store (belum direview)
+
+### Hasil review dan perubahan oleh saya

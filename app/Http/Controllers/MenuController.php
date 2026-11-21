@@ -61,7 +61,21 @@ class MenuController extends Controller
     // Prompt 10
     public function store(MenuRequest $request)
     {
-        abort(501, 'Belum diimplementasi');
+        $data = $request->validated();
+
+        // Simpan gambar jika ada file yang diunggah
+        if ($request->hasFile('image')) {
+            $data['image_path'] = $request->file('image')->store('menus', 'public');
+        }
+
+        // Hapus key 'image' karena kolom di database bernama image_path
+        unset($data['image']);
+
+        Menu::create($data);
+
+        return redirect()
+            ->route('owner.menus.index')
+            ->with('success', 'Menu berhasil ditambahkan.');
     }
 
     // Menampilkan form edit menu
