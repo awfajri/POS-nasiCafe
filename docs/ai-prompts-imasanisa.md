@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                                                                                        Showing [6] routes
+                                                                                                                            Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,7 +299,7 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                                                                                        Showing [7] routes
+                                                                                                                            Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
 
@@ -482,3 +482,14 @@ Aturannya begini:
 - Commit mentah AI: chore: draft AI MenuController update (belum direview)
 
 ### Hasil review dan perubahan oleh saya
+
+Yg aku perbaiki:
+
+1. Di kode asli, foto lama dihapus sebelum update dijalankan. pas aku tes lewat tinker (Storage::fake, update sengaja dipaksa gagal), muncul pesan "gagal", foto lama (menus/lama.jpg) sudah hilang dari folder menus, tapi image_path di database masih menunjuk menus/lama.jpg, dan foto baru tertinggal tanpa pemilik. Jadi kalo update gagal, menu kehilangan fotonya.
+   trs aku ubah urutannya: foto baru disimpan dulu, update dijalanin di dalam try/catch, foto lama baru dihapus setelah update berhasil. Kalo update gagal, foto baru dihapus dan errornya dilempar ulang.
+   Setelah perbaikan, tes yang sama tetap memunculkan pesan "gagal", tapi folder menus cuma berisi menus/lama.jpg dan image_path tetap menus/lama.jpg.
+2. aku tambah komentar penjelasan di method update, dan komentar "Prompt 11" kuganti dengan penjelasan method.
+
+Tes update normal lewat tinker (setelah perbaikan): foto lama terhapus, folder menus hanya berisi foto baru, dan image_path berisi path foto baru. Jadi perbaikan tidak merusak update yang berhasil.
+
+Yang belum dites: edit lewat form dan foto tampil di browser, menunggu view di Prompt 17.

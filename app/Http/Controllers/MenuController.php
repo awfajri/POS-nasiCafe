@@ -102,25 +102,39 @@ class MenuController extends Controller
         return view('owner.menus.form', compact('menu', 'categories'));
     }
 
-    // Prompt 11
+    // Menyimpan perubahan menu (stok boleh diubah langsung, untuk stock opname)
     public function update(MenuRequest $request, Menu $menu)
     {
         $data = $request->validated();
 
-        // Jika ada foto baru diunggah, hapus foto lama lalu simpan foto baru
-        if ($request->hasFile('image')) {
-            if ($menu->image_path) {
-                Storage::disk('public')->delete($menu->image_path);
-            }
-
-            $data['image_path'] = $request->file('image')->store('menus', 'public');
-        }
-
-        // Hapus key 'image' karena kolom di database adalah image_path
+        // 'image' (objek file) bukan kolom database, jadi dibuang dari data
         unset($data['image']);
 
-        // Perbarui data menu (termasuk stock langsung dari form/stock opname)
-        $menu->update($data);
+        $oldPath = $menu->image_path;
+        $newPath = null;
+
+        // Kalau ada foto baru, simpan DULU. Foto lama baru dihapus setelah update berhasil
+        if ($request->hasFile('image')) {
+            $newPath = $request->file('image')->store('menus', 'public');
+            $data['image_path'] = $newPath;
+        }
+
+        try {
+            $menu->update($data);
+        } catch (Throwable $e) {
+            // Update gagal: hapus foto baru supaya tidak yatim,
+            // foto lama tetap aman, lalu lempar ulang errornya
+            if ($newPath) {
+                Storage::disk('public')->delete($newPath);
+            }
+
+            throw $e;
+        }
+
+        // Update berhasil, sekarang aman menghapus foto lama (kalau ada)
+        if ($newPath && $oldPath) {
+            Storage::disk('public')->delete($oldPath);
+        }
 
         return redirect()
             ->route('owner.menus.index')
