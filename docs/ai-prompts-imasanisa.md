@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                                                                                  Showing [6] routes
+                                                                                                                        Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,7 +299,7 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                                                                                  Showing [7] routes
+                                                                                                                        Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
 
@@ -451,3 +451,34 @@ Catatan: try/catch ini cuma membersihkan file lalu melempar ulang error yang sam
 Tes simpan normal lewat tinker: file tersimpan dengan nama acak, image_path terisi, is_available true (sebelum dan sesudah perbaikan).
 
 Yg belum dites: simpan lewat form dan foto tampil di browser, menunggu view di Prompt 17.
+
+---
+
+## Prompt 11 - MenuController update
+
+- Tanggal: 21 November 2026
+- Branch: feature/master-crud
+- Tool AI: Antigravity (model Gemini 3.8 Flash)
+- Bagian yang diminta: isi method update di MenuController
+
+### Prompt yang dikirim
+
+Lanjut lagi ya, aku masih ngerjain modul Master Data proyek "NasiCafe POS" (Laravel 13, PHP 8.5, MySQL), branch feature/master-crud. MenuController sudah punya index, create, store, dan edit yang terisi. Sekarang tugasnya HANYA mengisi method update di app/Http/Controllers/MenuController.php.
+
+Aturannya begini:
+
+1. Ambil data dari $request->validated(). Jangan pernah pakai $request->all().
+2. Kolom stock ikut diperbarui langsung dari data form (ini fitur stock opname, jadi tidak perlu logika increment atau decrement).
+3. Kalau ada file gambar baru ($request->hasFile('image')), simpan dengan $request->file('image')->store('menus', 'public') lalu isi $data['image_path'] dengan path barunya. Foto lama ($menu->image_path) harus dihapus dari disk public dengan Storage::disk('public')->delete(...). Kalau tidak ada file baru, foto lama dibiarkan.
+4. Hapus key 'image' dari $data sebelum disimpan, karena kolom di database bernama image_path.
+5. Perbarui dengan $menu->update($data).
+6. Redirect ke route('owner.menus.index') dengan flash 'success' => 'Menu berhasil diperbarui.'
+7. Method lain (index, create, store, edit, destroy, updateStock) jangan diubah, dan jangan hapus komentar yang sudah ada.
+8. Jangan membuat atau mengubah file lain. Jangan menjalankan perintah terminal. Komentar singkat berbahasa Indonesia seperlunya.
+
+### Hasil
+
+- File dihasilkan: app/Http/Controllers/MenuController.php (method update)
+- Commit mentah AI: chore: draft AI MenuController update (belum direview)
+
+### Hasil review dan perubahan oleh saya

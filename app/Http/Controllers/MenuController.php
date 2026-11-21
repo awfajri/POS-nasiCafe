@@ -105,7 +105,26 @@ class MenuController extends Controller
     // Prompt 11
     public function update(MenuRequest $request, Menu $menu)
     {
-        abort(501, 'Belum diimplementasi');
+        $data = $request->validated();
+
+        // Jika ada foto baru diunggah, hapus foto lama lalu simpan foto baru
+        if ($request->hasFile('image')) {
+            if ($menu->image_path) {
+                Storage::disk('public')->delete($menu->image_path);
+            }
+
+            $data['image_path'] = $request->file('image')->store('menus', 'public');
+        }
+
+        // Hapus key 'image' karena kolom di database adalah image_path
+        unset($data['image']);
+
+        // Perbarui data menu (termasuk stock langsung dari form/stock opname)
+        $menu->update($data);
+
+        return redirect()
+            ->route('owner.menus.index')
+            ->with('success', 'Menu berhasil diperbarui.');
     }
 
     // Prompt 12
