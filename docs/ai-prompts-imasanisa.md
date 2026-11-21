@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                                              Showing [6] routes
+                                                                                                  Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,7 +299,7 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                                              Showing [7] routes
+                                                                                                  Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
 
@@ -323,7 +323,6 @@ Yang aku pelajari: validasi FormRequest dan route model binding jalan sebelum is
 - Branch: feature/master-crud
 - Tool AI: Antigravity (model Gemini 3.8 Flash)
 - Bagian yang diminta: isi method CategoryController (index, create, store, edit, update, destroy)
-- Catatan: prompt disusun dengan bantuan Claude
 
 ### Prompt yang dikirim
 
@@ -355,10 +354,48 @@ ATURAN
 
 ### Hasil review dan perubahan oleh saya
 
-### Hasil review dan perubahan oleh saya
-
 Yang aku cek: risiko slug kembar (misalnya "Nasi Spesial!" dan "Nasi Spesial" sama-sama jadi nasi-spesial, padahal kolom slug unique). Lewat tinker, Validator dengan aturan CategoryRequest menolak "Nasi Spesial!" dengan pesan "Nama kategori terlalu mirip dengan kategori lain.", jadi pencegahan dari Fase 1 udah menutup kasusnya dan store tidak akan error 500.
 
 Perubahan kode: aku menambahkan komentar penjelasan berbahasa Indonesia di tiap method CategoryController supaya aku paham alurnya. Logikanya tidak aku ubah karena hasilnya sudah sesuai kontrak dan risiko slug kembar sudah tertutup di request.
 
 Yang belum bisa dites sekarang: halaman index dan form (view dibuat di Prompt 14 dan 15), pesan error destroy yang harus ditampilkan view lewat $errors->first('category'), dan edit tanpa ganti nama harus tetap berhasil. Itu aku tes di browser setelah view jadi.
+
+---
+
+## Prompt 9 - MenuController index, create, edit
+
+- Tanggal: 21 November 2026
+- Branch: feature/master-crud
+- Tool AI: Antigravity (model Gemini 3.8 Flash)
+- Bagian yang diminta: isi method index, create, edit di MenuController
+
+### Prompt yang dikirim
+
+lanjuttt masi proyek Laravel 13 (PHP 8.5, MySQL) bernama NasiCafe POS, modul Master Data untuk role Owner. File app/Http/Controllers/MenuController.php sudah ada berisi 7 method kerangka (isinya abort(501)). Model Menu punya relasi category() belongsTo dan scopeLowStock (whereColumn stock <= min_stock). Model Category sudah ada. Ini bagian ketiga Fase 2: HANYA mengisi 3 method, yaitu index, create, dan edit.
+
+TUGAS
+Ganti isi method index, create, dan edit di app/Http/Controllers/MenuController.php. Pertahankan nama method, type hint, dan import yang sudah ada. Method lain (store, update, destroy, updateStock) JANGAN diubah, biarkan abort(501).
+
+1. index(Request $request):
+    - Query dasar: Menu::with('category').
+    - Pencarian nama: jika $request->filled('search'), tambahkan where('name', 'like', '%' . $request->search . '%').
+    - Filter kategori: jika $request->filled('category_id'), tambahkan where('category_id', $request->category_id).
+    - Filter stok kritis: jika $request->boolean('low_stock'), pakai scope lowStock().
+    - Urut berdasarkan name, paginate(10)->withQueryString().
+    - Ambil $categories = Category::orderBy('name')->get() untuk dropdown filter.
+    - Return view('owner.menus.index', compact('menus', 'categories')).
+2. create(): ambil $categories = Category::orderBy('name')->get(). Return view('owner.menus.form', ['menu' => null, 'categories' => $categories]).
+3. edit(Menu $menu): ambil $categories = Category::orderBy('name')->get(). Return view('owner.menus.form', compact('menu', 'categories')).
+
+ATURAN
+
+- Tambahkan import Category (App\Models\Category) di atas file kalau belum ada.
+- Kolom tabel menus: id, category_id, name, price, stock, min_stock, image_path, is_available, timestamps.
+- JANGAN membuat view. JANGAN mengubah route, model, request, migration, atau file lain. JANGAN menulis logika upload, stok, hapus, atau simpan. JANGAN menjalankan perintah terminal.
+
+### Hasil
+
+- File dihasilkan: app/Http/Controllers/MenuController.php (mengisi method index, create, edit)
+- Commit mentah AI: chore: draft AI MenuController index create edit (belum direview)
+
+### Hasil review dan perubahan oleh saya
