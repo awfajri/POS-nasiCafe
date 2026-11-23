@@ -1,7 +1,7 @@
 @if (session('success'))
     <div x-data="{ show: true }" x-show="show" class="mb-6 flex items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/90 px-4 py-3 text-sm text-emerald-950 shadow-xs" role="alert">
         <div class="flex items-center gap-2.5">
-            <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-xs font-bold text-white" aria-hidden="true">✓</span>
+            <x-lucide-check-circle-2 class="w-5 h-5 text-emerald-600 shrink-0" />
             <span class="font-medium">{{ session('success') }}</span>
         </div>
         <button @click="show = false" type="button" class="p-1 rounded-lg text-emerald-700 hover:bg-emerald-100 hover:text-emerald-900 transition" aria-label="Tutup">
