@@ -145,7 +145,7 @@ class MenuController extends Controller
         // Menghapus menu (ditolak kalau sudah pernah dipakai di transaksi)
     public function destroy(Menu $menu)
     {
-        // Menu yang sudah pernah dipakai di transaksi tidak boleh dihapus,
+        //hah Menu yang sudah pernah dipakai di transaksi tidak boleh dihapus,
         // owner diarahkan untuk menonaktifkannya lewat is_available
         if ($menu->transactionDetails()->exists()) {
             throw ValidationException::withMessages([
@@ -168,10 +168,22 @@ class MenuController extends Controller
             ->route('owner.menus.index')
             ->with('success', 'Menu berhasil dihapus.');
     }
-    
-    // Prompt 13
+
+    // Prompt 13 - Fitur Quick Restock
     public function updateStock(Request $request, Menu $menu)
     {
-        abort(501, 'Belum diimplementasi');
+        $validated = $request->validate([
+            'stock_action' => ['required', 'in:add,set'],
+            'amount' => ['required', 'integer', 'min:0', 'max:100000'],
+        ]);
+
+        // Tambah atau set nilai stok menu
+        if ($validated['stock_action'] === 'add') {
+            $menu->increment('stock', $validated['amount']);
+        } elseif ($validated['stock_action'] === 'set') {
+            $menu->update(['stock' => $validated['amount']]);
+        }
+
+        return back()->with('success', 'Stok menu berhasil diperbarui.');
     }
 }

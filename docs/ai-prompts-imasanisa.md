@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                                                                                                          Showing [6] routes
+                                                                                                                                                Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,7 +299,7 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                                                                                                          Showing [7] routes
+                                                                                                                                                Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
 
@@ -533,3 +533,32 @@ aku tes juga lewat tinker: hapus normal (foto dan data sama-sama terhapus, folde
 Yang kubiarkan: celah waktu antara exists() dan delete() tidak kuubah, karena restrictOnDelete di database tetap menolak.
 
 Yang belum dites: tombol hapus dan tampilan pesan error di browser, menunggu view di Prompt 16.
+
+---
+
+## Prompt 13 - MenuController updateStock
+
+- Tanggal: 23 November 2026
+- Branch: feature/master-crud
+- Tool AI: Antigravity (model Gemini 3.8 Flash)
+- Bagian yang diminta: isi method updateStock di MenuController
+
+### Prompt yang dikirim
+
+Lanjut lagii ya, aku masih ngerjain modul Master Data proyek "NasiCafe POS" (Laravel 13, PHP 8.5, MySQL), branch feature/master-crud. MenuController sudah punya index, create, store, edit, update, dan destroy yang terisi. Sekarang tugasnya HANYA mengisi method updateStock(Request $request, Menu $menu) di app/Http/Controllers/MenuController.php. Method ini untuk fitur Quick Restock di daftar menu.
+
+aturannya kek gini:
+
+1. Validasi lewat $request->validate([...]) dengan aturan: stock_action required in:add,set, dan amount required integer min:0 max:100000. Pakai hasil validate() itu, jangan pakai $request->all().
+2. Kalau stock_action = add, tambahkan stok dengan $menu->increment('stock', $amount). Kalau stock_action = set, isi stok langsung dengan $menu->update(['stock' => $amount]).
+3. Ini satu-satunya tempat yang boleh mengubah stok di luar TransactionService (restock manual milik Master Data). Jangan ubah kolom lain.
+4. Redirect kembali ke halaman sebelumnya dengan back() dan flash 'success' => 'Stok menu berhasil diperbarui.'
+5. Method lain (index, create, store, edit, update, destroy) jangan diubah, dan jangan hapus komentar yang sudah ada.
+6. Jangan membuat atau mengubah file lain. Jangan menjalankan perintah terminal. Komentar singkat berbahasa Indonesia seperlunya.
+
+### Hasil
+
+- File dihasilkan: app/Http/Controllers/MenuController.php (method updateStock)
+- Commit mentah AI: chore: draft AI MenuController updateStock (belum direview)
+
+### Hasil review dan perubahan oleh saya
