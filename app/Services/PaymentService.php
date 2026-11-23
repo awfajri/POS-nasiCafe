@@ -159,10 +159,12 @@ class PaymentService
             $isFullyPaid = $allDetailsPaid || $newPaidAmount >= $lockedTransaction->total_amount;
 
             $lockedTransaction->update([
+                'cashier_id' => $lockedTransaction->cashier_id ?? $cashier->id,
                 'paid_amount' => $newPaidAmount,
                 'payment_status' => $isFullyPaid
                     ? Transaction::PAYMENT_PAID
                     : Transaction::PAYMENT_PARTIAL,
+                'expires_at' => null,
             ]);
 
             if ($lockedTransaction->status === Transaction::STATUS_PENDING) {
