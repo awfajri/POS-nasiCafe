@@ -21,6 +21,7 @@
             <aside class="space-y-6">
                 <section class="rounded-3xl border border-slate-200/90 bg-white p-5 shadow-xs"><h2 class="mb-4 text-lg font-semibold">Ringkasan</h2><dl class="space-y-3 text-sm"><div class="flex justify-between"><dt class="text-slate-500">Pelanggan</dt><dd class="font-medium">{{ $transaction->customer_name }}</dd></div><div class="flex justify-between"><dt class="text-slate-500">Meja</dt><dd class="font-medium">{{ $transaction->table_number ?: '-' }}</dd></div><div class="flex justify-between"><dt class="text-slate-500">Total</dt><dd class="font-semibold">Rp {{ number_format($transaction->total_amount, 0, ',', '.') }}</dd></div><div class="flex justify-between"><dt class="text-slate-500">Dibayar</dt><dd class="font-semibold text-emerald-600">Rp {{ number_format($transaction->paid_amount, 0, ',', '.') }}</dd></div><div class="flex justify-between border-t border-slate-100 pt-3"><dt class="font-semibold">Sisa</dt><dd class="font-bold">Rp {{ number_format(max(0, $transaction->total_amount - $transaction->paid_amount), 0, ',', '.') }}</dd></div></dl></section>
                 @include('transactions._status-actions', ['transaction' => $transaction, 'transitions' => $transitions])
+                @includeIf('payments._actions', ['transaction' => $transaction])
             </aside>
         </div>
     </div>

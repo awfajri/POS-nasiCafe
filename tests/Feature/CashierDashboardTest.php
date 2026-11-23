@@ -29,7 +29,7 @@ class CashierDashboardTest extends TestCase
             ->get(route('cashier.dashboard'))
             ->assertOk()
             ->assertViewIs('cashier.dashboard')
-            ->assertViewHasAll(['pendingCount', 'processingCount', 'completedToday', 'totalToday', 'activeQueue', 'lowStockMenus']);
+            ->assertViewHasAll(['pendingCount', 'processingCount', 'completedToday', 'totalToday', 'awaitingQris', 'activeQueue', 'lowStockMenus']);
     }
 
     public function test_non_cashier_cannot_open_cashier_dashboard(): void
