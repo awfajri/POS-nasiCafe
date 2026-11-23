@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                                                                                                                          Showing [6] routes
+                                                                                                                                                                    Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,7 +299,7 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                                                                                                                          Showing [7] routes
+                                                                                                                                                                    Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
 
@@ -609,3 +609,12 @@ Aturannya begini:
 - Commit mentah AI: chore: draft AI view kategori index (belum direview)
 
 ### Hasil review dan perubahan oleh saya
+
+Yg aku perbaiki:
+
+1. Konfirmasi hapus awalnya bermasalah saat diuji dengan kategori namanya "Tes D'Amore" (popup konfirmasi nya ga muncul). trs aku ganti dengan @js(...) pada onsubmit confirm. trs abi itu perbaikan dites di browser, popup konfirmasi muncul dengan nama kategori dan kategori berhasil dihapus.
+2. Kotak peringatan merah untuk $errors->first('category') di view ternyata membuat pesan error muncul dua kali saat kategori "Minuman" dicoba dihapus karena masih memiliki menu (kotak di dalam view dan alert di layout). Kotak merah di view kuhapus sehingga pesan error cuma muncul sekali.
+
+yang belum dites:
+
+- Tombol Tambah dan Edit belum dites penuh karena view form kategori (form.blade.php) belum dibuat/dites (Prompt 15).

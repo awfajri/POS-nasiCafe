@@ -21,15 +21,7 @@
         </div>
     </div>
 
-    {{-- Notifikasi Error Validasi Bisnis (misal kategori gagal dihapus karena masih ada menu) --}}
-    @if ($errors->has('category'))
-        <div class="flex items-start justify-between gap-3 rounded-2xl border border-rose-200 bg-rose-50/90 p-4 text-sm text-rose-950 shadow-xs" role="alert">
-            <div class="flex items-start gap-2.5">
-                <x-lucide-alert-circle class="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
-                <span class="font-medium">{{ $errors->first('category') }}</span>
-            </div>
-        </div>
-    @endif
+    {{-- Pesan error hapus (key 'category') sudah ditampilkan komponen alert di layout --}}
 
     {{-- Kartu Tabel Kategori --}}
     <div class="bg-white rounded-2xl border border-surface-border shadow-xs overflow-hidden">
@@ -77,7 +69,7 @@
                                         <form
                                             method="POST"
                                             action="{{ route('owner.categories.destroy', $category) }}"
-                                            onsubmit="return confirm('Apakah Anda yakin ingin menghapus kategori &quot;{{ $category->name }}&quot;?');"
+                                            onsubmit="return confirm(@js('Apakah Anda yakin ingin menghapus kategori ' . $category->name . '?'))"
                                             class="inline"
                                         >
                                             @csrf
