@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                                                                                                                                              Showing [6] routes
+                                                                                                                                                                                  Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,7 +299,7 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                                                                                                                                              Showing [7] routes
+                                                                                                                                                                                  Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
 
@@ -664,3 +664,49 @@ View memakai @extends dan @section sesuai kontrak, judul berubah dinamis antara 
 disini ada beberapa yg aku perbaiki:
 
 1. Tampilan tombol Simpan dan Batal di bagian bawah form dirapihin karena terlalu mepet dan gaenak diliat. agar posisi ikon, jarak, dan ukurannya sejajar serta lebih nyaman dilihat.
+
+---
+
+## Prompt 16 - View daftar menu (index & quick restock)
+
+- Tanggal: 23 November 2026
+- Branch: feature/master-crud
+- Tool AI: Antigravity
+- Bagian yang diminta: resources/views/owner/menus/index.blade.php
+
+### Prompt yang dikirim
+
+Lanjut lagi ya, aku masih ngerjain modul Master Data proyek "NasiCafe POS" (Laravel 13, Tailwind, Alpine.js), branch feature/master-crud. MenuController (termasuk updateStock) dan view kategori sudah selesai. Sekarang tugasnya HANYA membuat satu view: `resources/views/owner/menus/index.blade.php`.
+
+kayak biasa ya sebelum menulis, liat dulu `resources/views/layouts/app.blade.php` dan folder `resources/views/components`, lalu ikutin gaya yang udah dipakai. Cek juga apakah layout udah menampilkan `<x-alert />` sendiri. Kalo sudah, jangan tampilin lagi di view supaya pesannya ga dobel.
+
+nahh aturannyaa:
+
+1. Awalin dengan `@extends('layouts.app')`, `@section('title', ...)`, dan `@section('content')`.
+2. Output pakai `{{ }}`, dilarang `{!! !!}`. Setiap form wajib `@csrf`.
+3. Desain rapi, konsisten dengan layout yang ada, dan tidak terlihat kayak template generik. Pakai class Tailwind yang udah dipakai di layout.
+4. Semua teks berbahasa Indonesia.
+
+Aturan `index.blade.php` (data dari controller: `$menus`, hasil `paginate(10)` dengan `with('category')` dan `withQueryString()`, serta `$categories` untuk filter):
+
+1. Judul halaman "Menu & Stok" (atau "Daftar Menu") dan tombol "Tambah Menu" ke `route('owner.menus.create')`.
+2. Form filter (`method="GET"`, `action="{{ route('owner.menus.index') }}"`) untuk:
+    - Pencarian nama menu (`name="search"`, nilai `request('search')`)
+    - Filter kategori (`name="category_id"`, pilihan dari `$categories`, nilai `request('category_id')`)
+    - Filter stok kritis (`name="low_stock"`, checkbox/toggle untuk nilai `1` / `request()->boolean('low_stock')`)
+      Sertakan tombol reset/bersihkan filter ke `route('owner.menus.index')` jika diperlukan.
+3. Tabel daftar menu yang menampilkan: foto menu (jika ada `$menu->image_path`, tampilkan lewat `Storage::url($menu->image_path)` atau placeholder aman jika kosong), nama menu, kategori (`$menu->category?->name ?? '-'`), harga, stok (`$menu->stock`) dan batas stok minimum (`$menu->min_stock`) / status ketersediaan (`$menu->is_available`), form Quick Restock, serta tombol aksi.
+4. Form Quick Restock per baris: `method="POST"` ke `route('owner.menus.updateStock', $menu)`, tambahkan `@csrf` dan `@method('PATCH')`, input `stock_action` (`add` atau `set`) dan `amount` (`number`, `min="0"`, `max="100000"`).
+5. Tampilkan pesan error validasi (termasuk error `amount` / `stock_action` dari `updateStock` dan error `menu` saat gagal hapus) dengan cara yang tidak membuat pesan dobel atau muncul berulang di semua baris.
+6. Aksi per baris: tombol Edit ke `route('owner.menus.edit', $menu)` dan tombol Hapus berupa form `method="POST"` ke `route('owner.menus.destroy', $menu)` dengan `@csrf`, `@method('DELETE')`, dan konfirmasi aman (`@js(...)`).
+7. Tampilkan empty state yang rapi kalau `$menus` kosong, serta paginasi dengan `$menus->links()`.
+
+nahh btw
+JANGAN mengubah controller, route, model, request, layout, komponen, atau file lain. JANGAN menjalankan perintah terminal. Komentar Blade singkat berbahasa Indonesia seperlunya.
+
+### Hasil
+
+- File dihasilkan: resources/views/owner/menus/index.blade.php
+- Commit mentah AI: chore: draft AI view daftar menu (belum direview)
+
+### Hasil review dan perubahan oleh saya
