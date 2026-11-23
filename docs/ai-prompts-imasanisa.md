@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                                                                                                    Showing [6] routes
+                                                                                                                                          Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,7 +299,7 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                                                                                                    Showing [7] routes
+                                                                                                                                          Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
 
@@ -522,3 +522,14 @@ Aturannya begini:
 - Commit mentah AI: chore: draft AI MenuController destroy (belum direview)
 
 ### Hasil review dan perubahan oleh saya
+
+Yg aku perbaiki:
+
+1. Di kode asli foto dihapus sebelum $menu->delete(). pas aku tes lewat tinker (Storage::fake, delete dipaksa gagal), muncul pesan "gagal", folder menus kosong (foto sudah terhapus), tapi menu masih ada dan image_path masih menunjuk menus/lama.jpg. aku ubah urutannya: data dihapus dulu, foto dihapus setelah berhasil. setelah perbaikan, tes yang sama tetap memunculkan "gagal", tapi folder menus masih berisi menus/lama.jpg dan image_path tetap menus/lama.jpg.
+2. Kutambah komentar penjelasan, dan komentar "Prompt 12" kuganti dengan penjelasan method.
+
+aku tes juga lewat tinker: hapus normal (foto dan data sama-sama terhapus, folder menus kosong dan menu tidak ditemukan). Menu yang sudah dipakai di transaksi (dibuat satu TransactionDetail lewat factory) ditolak dengan ValidationException "Menu tidak dapat dihapus karena sudah pernah dipakai dalam transaksi. Nonaktifkan menu (is_available) sebagai gantinya."
+
+Yang kubiarkan: celah waktu antara exists() dan delete() tidak kuubah, karena restrictOnDelete di database tetap menolak.
+
+Yang belum dites: tombol hapus dan tampilan pesan error di browser, menunggu view di Prompt 16.

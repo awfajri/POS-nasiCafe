@@ -142,28 +142,33 @@ class MenuController extends Controller
             ->with('success', 'Menu berhasil diperbarui.');
     }
 
-    // Prompt 12
+        // Menghapus menu (ditolak kalau sudah pernah dipakai di transaksi)
     public function destroy(Menu $menu)
     {
-        // Cegah penghapusan jika menu sudah pernah tercatat dalam transaksi
+        // Menu yang sudah pernah dipakai di transaksi tidak boleh dihapus,
+        // owner diarahkan untuk menonaktifkannya lewat is_available
         if ($menu->transactionDetails()->exists()) {
             throw ValidationException::withMessages([
                 'menu' => 'Menu tidak dapat dihapus karena sudah pernah dipakai dalam transaksi. Nonaktifkan menu (is_available) sebagai gantinya.',
             ]);
         }
 
-        // Hapus file foto dari storage public jika ada
-        if ($menu->image_path) {
-            Storage::disk('public')->delete($menu->image_path);
-        }
+        // Simpan path foto dulu untuk dipakai setelah data terhapus
+        $path = $menu->image_path;
 
+        // Hapus data DULU. Kalau gagal, foto masih aman
         $menu->delete();
+
+        // Data sudah terhapus, sekarang aman menghapus foto (kalau ada)
+        if ($path) {
+            Storage::disk('public')->delete($path);
+        }
 
         return redirect()
             ->route('owner.menus.index')
             ->with('success', 'Menu berhasil dihapus.');
     }
-
+    
     // Prompt 13
     public function updateStock(Request $request, Menu $menu)
     {
