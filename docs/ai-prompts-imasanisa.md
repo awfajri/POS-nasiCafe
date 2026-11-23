@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                                                                                                                                                  Showing [6] routes
+                                                                                                                                                                                        Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,7 +299,7 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                                                                                                                                                  Showing [7] routes
+                                                                                                                                                                                        Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
 
@@ -710,3 +710,17 @@ JANGAN mengubah controller, route, model, request, layout, komponen, atau file l
 - Commit mentah AI: chore: draft AI view daftar menu (belum direview)
 
 ### Hasil review dan perubahan oleh saya
+
+Aku udah cek resources/views/owner/menus/index.blade.php dan menyesuaikan sama layout serta aturan proyek. Struktur @extends('layouts.app'), @section('title', 'Menu & Stok'), dan @section('content') sudah sesuai, semua data ditampilkan pakai {{ }} tanpa {!! !!}, form Quick Restock dan hapus sudah ada @csrf serta method-nya, empty state sama paginasi juga sudah ada, dan <x-alert /> tidak dipasang lagi di view karena sudah muncul dari layout.
+
+Pas review dan coba langsung di browser, ada beberapa hal yang aku benerin:
+
+Form Quick Restock tadinya mengarah ke owner.menus.updateStock dan sempet nyasar di bagian atas di luar @foreach ($menus as $menu), jadi sempet bikin error route ga ada dan Undefined variable $menu. Route-nya aku ganti jadi route('owner.menus.stock', $menu) dan form-nya aku pindah ke dalam loop tiap baris menu.
+
+Bagian filter di atas aku rapihin biar sejajar satu baris di desktop (input cari, kategori, checkbox stok kritis, tombol Filter, plus tombol Reset kalau filter lagi dipakai), dan jarak kiri input cari kulebarin dikit biar teks/placeholder-nya nggak nabrak ikon kaca pembesar.
+
+Di kolom Stok & Status, angka stok sama Min. stok aku pisah barisnya, lalu badge status stok (Habis kalau 0, Kritis kalo <= min_stock, Aman kalau lebih) dan status jual (Aktif / Nonaktif) dibedakan dan disejajarkan berdampingan pakai gaya pill yang seragam.
+
+Di kolom Quick Restock, lebar input jumlah kubuat w-20 dengan latar bg-surface-light dan tombol Update, terus popup konfirmasi hapus aku pakaiin @js(...).
+
+Hasil tes di browser: filter dan reset jalan sesuai query, popup konfirmasi hapus muncul dengan nama menunya, dan tombol Tambah Menu / Edit mengarah ke owner.menus.form yang bakal dikerjain di Prompt 17.
