@@ -6,6 +6,7 @@ use App\Http\Requests\MenuRequest;
 use App\Models\Category;
 use App\Models\Menu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Throwable;
@@ -142,10 +143,10 @@ class MenuController extends Controller
             ->with('success', 'Menu berhasil diperbarui.');
     }
 
-        // Menghapus menu (ditolak kalau sudah pernah dipakai di transaksi)
+    // Menghapus menu (ditolak kalau sudah pernah dipakai di transaksi)
     public function destroy(Menu $menu)
     {
-        //hah Menu yang sudah pernah dipakai di transaksi tidak boleh dihapus,
+        // Menu yang sudah pernah dipakai di transaksi tidak boleh dihapus,
         // owner diarahkan untuk menonaktifkannya lewat is_available
         if ($menu->transactionDetails()->exists()) {
             throw ValidationException::withMessages([
@@ -169,20 +170,42 @@ class MenuController extends Controller
             ->with('success', 'Menu berhasil dihapus.');
     }
 
-    // Prompt 13 - Fitur Quick Restock
+    // Quick Restock: menambah (add) atau menimpa (set) stok dari daftar menu
     public function updateStock(Request $request, Menu $menu)
     {
         $validated = $request->validate([
             'stock_action' => ['required', 'in:add,set'],
             'amount' => ['required', 'integer', 'min:0', 'max:100000'],
+        ], [
+            'stock_action.required' => 'Jenis perubahan stok wajib dipilih.',
+            'stock_action.in' => 'Jenis perubahan stok tidak valid.',
+            'amount.required' => 'Jumlah stok wajib diisi.',
+            'amount.integer' => 'Jumlah stok harus berupa angka bulat.',
+            'amount.min' => 'Jumlah stok tidak boleh kurang dari 0.',
+            'amount.max' => 'Jumlah stok maksimal 100000 per aksi.',
         ]);
 
-        // Tambah atau set nilai stok menu
-        if ($validated['stock_action'] === 'add') {
-            $menu->increment('stock', $validated['amount']);
-        } elseif ($validated['stock_action'] === 'set') {
-            $menu->update(['stock' => $validated['amount']]);
-        }
+        DB::transaction(function () use ($menu, $validated) {
+            // Kunci baris menu supaya tidak bentrok dengan pemotongan stok transaksi
+            $locked = Menu::whereKey($menu->id)->lockForUpdate()->firstOrFail();
+
+            // Hitung stok akhir. Batasnya sama dengan MenuRequest (maks 100000)
+            $newStock = $validated['stock_action'] === 'add'
+                ? $locked->stock + $validated['amount']
+                : $validated['amount'];
+
+            if ($newStock > 100000) {
+                throw ValidationException::withMessages([
+                    'amount' => 'Stok total tidak boleh lebih dari 100000.',
+                ]);
+            }
+
+            if ($validated['stock_action'] === 'add') {
+                $locked->increment('stock', $validated['amount']);
+            } else {
+                $locked->update(['stock' => $validated['amount']]);
+            }
+        });
 
         return back()->with('success', 'Stok menu berhasil diperbarui.');
     }

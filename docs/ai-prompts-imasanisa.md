@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                                                                                                                Showing [6] routes
+                                                                                                                                                    Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,7 +299,7 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                                                                                                                Showing [7] routes
+                                                                                                                                                    Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
 
@@ -562,3 +562,14 @@ aturannya kek gini:
 - Commit mentah AI: chore: draft AI MenuController updateStock (belum direview)
 
 ### Hasil review dan perubahan oleh saya
+
+Yg kuperbaiki:
+
+1. Batas 100000 hanya berlaku per aksi, jadi add berulang bisa menumpuk. Waktu kutes lewat tinker (stok 99999 ditambah 100), tidak ada error dan stok jadi 100099. Padahal MenuRequest membatasi stok maksimal 100000, jadi menu itu akan ditolak saat diedit lewat form. Kutambah pengecekan stok akhir, kalau lebih dari 100000 dilempar ValidationException. Setelah perbaikan, tes yang sama menampilkan "Stok total tidak boleh lebih dari 100000." dan stok tetap 99999.
+2. Kontrak meminta operasi stok memakai DB::transaction + lockForUpdate, tapi kode asli tidak. Kubungkus dengan transaction dan kukunci baris menu.
+3. Pesan error bawaan (bahasa Inggris, misalnya "The selected stock action is invalid.") kuganti dengan pesan bahasa Indonesia. Setelah perbaikan muncul "Jenis perubahan stok tidak valid." dan "Jumlah stok harus berupa angka bulat."
+4. Kutambah komentar penjelasan di updateStock, dan kurapikan indentasi komentar destroy.
+
+Tes normal lewat tinker: add 5 dari stok 10 jadi 15, lalu set 3 jadi 3.
+
+Yang belum dites: form Quick Restock dan tampilan pesan error di browser, menunggu view di Prompt 16.
