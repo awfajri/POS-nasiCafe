@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                                                                                                                    Showing [6] routes
+                                                                                                                                                          Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,7 +299,7 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                                                                                                                    Showing [7] routes
+                                                                                                                                                          Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
 
@@ -573,3 +573,39 @@ Yg kuperbaiki:
 Tes normal lewat tinker: add 5 dari stok 10 jadi 15, lalu set 3 jadi 3.
 
 Yang belum dites: form Quick Restock dan tampilan pesan error di browser, menunggu view di Prompt 16.
+
+---
+
+## Prompt 14 - View kategori index
+
+- Tanggal: 23 November 2026
+- Branch: feature/master-crud
+- Tool AI: Antigravity (model Gemini 3.8 Flash)
+- Bagian yang diminta: resources/views/owner/categories/index.blade.php
+
+### Prompt yang dikirim
+
+Lanjut ya, aku masih ngerjain modul Master Data proyek "NasiCafe POS" (Laravel 13, Tailwind, Alpine.js), branch feature/master-crud. CategoryController sudah selesai. Sekarang tugasnya HANYA membuat SATU view: resources/views/owner/categories/index.blade.php.
+
+ooh iyaa sebelum menulis, lihat dulu resources/views/layouts/app.blade.php dan folder resources/views/components, lalu ikuti gaya yang sudah dipakai. Cek juga apakah layout sudah menampilkan <x-alert /> sendiri. Kalau sudah, jangan tampilkan lagi di view supaya pesannya tidak dobel.
+
+Aturannya begini:
+
+1. Awali dengan @extends('layouts.app'), @section('title', 'Kategori Menu'), dan @section('content').
+2. Output pakai {{ }}, dilarang {!! !!}. Setiap form wajib @csrf.
+3. Desain rapi, konsisten dengan layout yang ada, dan tidak terlihat seperti template generik. Pakai class Tailwind yang sudah dipakai di layout. Semua teks berbahasa Indonesia.
+4. Data dari controller: $categories (hasil paginate(10) dengan withCount('menus')).
+5. Judul halaman "Kategori Menu" dan tombol "Tambah Kategori" ke route('owner.categories.create').
+6. Tabel dengan kolom: nama, slug, deskripsi (tampilkan "-" kalau kosong), jumlah menu (pakai $category->menus_count), dan aksi.
+7. Aksi per baris: tombol Edit ke route('owner.categories.edit', $category), dan tombol Hapus berupa form method POST dengan @csrf dan @method('DELETE') ke route('owner.categories.destroy', $category), dengan konfirmasi sebelum kirim (onsubmit confirm atau Alpine.js).
+8. Controller bisa melempar error validasi dengan key 'category' (kategori masih punya menu). Tampilkan pesan itu di atas tabel memakai $errors->first('category') dalam kotak peringatan merah, hanya kalau ada.
+9. Kalau ga ada kategori, tampilkan empty state yang rapi.
+10. Tampilkan paginasi dengan $categories->links().
+11. JANGAN membuat view lain (form dibuat di prompt berikutnya). JANGAN mengubah controller, route, model, request, layout, komponen, atau file lain. JANGAN menjalankan perintah terminal. Komentar Blade singkat berbahasa Indonesia seperlunya.
+
+### Hasil
+
+- File dihasilkan: resources/views/owner/categories/index.blade.php
+- Commit mentah AI: chore: draft AI view kategori index (belum direview)
+
+### Hasil review dan perubahan oleh saya
