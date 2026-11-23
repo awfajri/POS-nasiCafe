@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                                                                                                                                                                Showing [6] routes
+                                                                                                                                                                                                      Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,7 +299,7 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                                                                                                                                                                Showing [7] routes
+                                                                                                                                                                                                      Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
 
@@ -771,3 +771,7 @@ oooo iyaaa JANGAN mengubah controller, route, model, request, layout, komponen, 
 - Commit mentah AI: chore: draft AI view form menu (belum direview)
 
 ### Hasil review dan perubahan oleh saya
+
+Aku sudah cek resources/views/owner/menus/form.blade.php dan mencocokkannya sama layout serta aturan proyek. View udah memakai @extends('layouts.app'), @section('title', ...) dan @section('content'), semua data memakai {{ }} tanpa {!! !!}, form udah ada @csrf, enctype="multipart/form-data", dan @method('PUT') saat edit, nilai awal memakai old(...) dengan fallback ke $menu (serta default yang sesuai), pesan error per field pakai @error(...), tombol Batal mengarah ke route('owner.menus.index'), dan <x-alert /> tidak ditampilkan lagi di view karena udah muncul dari layout.
+
+Pas aku tes dan liat langsung di browser, tombol simpan (Simpan Perubahan / Simpan Menu) kelihatan agak mepet pinggir dan kurang lega, jadi padding serta whitespace-nowrap-nya aku rapihin di view. Hasil uji di browser: mode tambah (/owner/menus/create) dan edit (/owner/menus/5/edit) tampil sesuai data, simpan perubahan menu berhasil dengan notifikasi sukses, dan tambah menu baru (Es Jeruk Tes) juga berhasil masuk ke daftar menu. (Kalau menu tes Es Jeruk Tes nggak dipakai lagi, bisa dihapus lewat tombol Hapus di daftar menu.)
