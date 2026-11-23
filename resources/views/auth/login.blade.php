@@ -52,15 +52,8 @@
                         aria-label="Tampilkan atau sembunyikan password"
                         class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-ink-primary hover:text-brand-700 focus:outline-none"
                     >
-                        <svg x-show="!show" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-                            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-                            <line x1="1" y1="1" x2="23" y2="23"/>
-                        </svg>
-                        <svg x-show="show" x-cloak xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                            <circle cx="12" cy="12" r="3"/>
-                        </svg>
+                        <x-lucide-eye-off x-show="!show" class="h-4 w-4" stroke-width="1.8" />
+                        <x-lucide-eye x-show="show" x-cloak class="h-4 w-4" stroke-width="1.8" />
                     </button>
                 </div>
                 @error('password')
