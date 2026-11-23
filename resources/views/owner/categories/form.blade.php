@@ -73,16 +73,16 @@
             </div>
 
             {{-- Tombol Aksi --}}
-            <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+            <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
                 <a
                     href="{{ route('owner.categories.index') }}"
-                    class="inline-flex items-center justify-center px-4 py-2.5 rounded-xl border border-surface-border bg-white text-slate-700 hover:bg-slate-50 font-semibold text-sm transition shadow-xs"
+                    class="inline-flex items-center justify-center px-4 py-2.5 rounded-xl border border-surface-border bg-white text-slate-700 hover:bg-slate-50 font-semibold text-sm transition"
                 >
                     Batal
                 </a>
                 <button
                     type="submit"
-                    class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#2b2d6e] hover:bg-[#202253] text-white font-semibold text-sm transition shadow-xs"
+                    class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#2b2d6e] hover:bg-[#202253] text-white font-semibold text-sm transition cursor-pointer"
                 >
                     <x-lucide-save class="w-4 h-4 shrink-0" />
                     <span>Simpan</span>
