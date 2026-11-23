@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                                                                                                                                    Showing [6] routes
+                                                                                                                                                                        Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,7 +299,7 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                                                                                                                                    Showing [7] routes
+                                                                                                                                                                        Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
 
@@ -618,3 +618,44 @@ Yg aku perbaiki:
 yang belum dites:
 
 - Tombol Tambah dan Edit belum dites penuh karena view form kategori (form.blade.php) belum dibuat/dites (Prompt 15).
+
+---
+
+## Prompt 15 - View form kategori (create & edit)
+
+- Tanggal: 23 November 2026
+- Branch: feature/master-crud
+- Tool AI: Antigravity
+- Bagian yang diminta: resources/views/owner/categories/form.blade.php
+- Catatan: prompt disusun dengan bantuan AI
+
+### Prompt yang dikirim
+
+Lesgoo lanjut, aku masih ngerjain modul Master Data proyek "NasiCafe POS" (Laravel 13, Tailwind, Alpine.js), branch feature/master-crud. CategoryController dan view `resources/views/owner/categories/index.blade.php` sudah selesai. Sekarang tugasnya HANYA membuat satu view: `resources/views/owner/categories/form.blade.php` yang dipakai untuk tambah dan edit kategori.
+
+Sebelum nulis, liat dulu `resources/views/layouts/app.blade.php` dan folder `resources/views/components`, lalu ikuti gaya yang sudah dipakai. Cek juga apakah layout sudah menampilkan `<x-alert />` sendiri. Kalau sudah, jangan tampilkan lagi di view supaya pesannya tidak dobel.
+
+untuk aturannyaa
+
+1. Awali dengan `@extends('layouts.app')`, `@section('title', ...)`, dan `@section('content')`.
+2. Output pakai `{{ }}`, dilarang `{!! !!}`. Setiap form wajib `@csrf`.
+3. Desain rapi, konsisten dengan layout yang ada, dan tidak terlihat seperti template generik. Pakai class Tailwind yang sudah dipakai di layout.
+4. Semua teks berbahasa Indonesia.
+
+Aturan `form.blade.php` (variabel `$category` bernilai `null` saat tambah, dan berisi model `Category` saat edit):
+
+1. Judul halaman/header berbeda: "Tambah Kategori" kalau `$category` bernilai `null`, dan "Edit Kategori" kalau tidak `null`.
+2. Form method `POST`. Saat tambah (`$category` `null`), `action` ke `route('owner.categories.store')`. Saat edit, `action` ke `route('owner.categories.update', $category)` dan tambahkan `@method('PUT')`. Tambahkan `@csrf`.
+3. Field: `name` (input teks, wajib) dan `description` (textarea, opsional). Isi nilainya dengan `old('name', $category?->name)` dan `old('description', $category?->description)`.
+4. Tampilkan pesan error per field dengan `@error('name')` dan `@error('description')`, dan beri border merah pada field yang error.
+5. Tombol "Simpan" dan tombol "Batal" yang kembali ke `route('owner.categories.index')`.
+
+oooh iyaa
+JANGAN mengubah controller, route, model, request, layout, komponen, atau file lain. JANGAN menjalankan perintah terminal. Komentar Blade singkat berbahasa Indonesia seperlunya.
+
+### Hasil
+
+- File dihasilkan: resources/views/owner/categories/form.blade.php
+- Commit mentah AI: chore: draft AI view form kategori (belum direview)
+
+### Hasil review dan perubahan oleh saya
