@@ -58,14 +58,14 @@
                     @foreach ($categories as $category)
                         <button
                             type="button"
-                            @click="selectedCategory = '{{ $category->id }}'"
-                            :class="selectedCategory === '{{ $category->id }}'
+                            @click="selectedCategory = @json((string) $category->id)"
+                            :class="selectedCategory === @json((string) $category->id)
                                 ? 'bg-[#2b2d6e] text-white shadow-xs'
                                 : 'bg-slate-100 hover:bg-slate-200 text-slate-600'"
                             class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition shrink-0 whitespace-nowrap"
                         >
                             {{ $category->name }}
-                            <span class="text-xs opacity-80">({{ $category->menus->where('is_available', true)->count() }})</span>
+                            <span class="text-xs opacity-80">({{ $category->menus_count }})</span>
                         </button>
                     @endforeach
                 </div>
@@ -410,10 +410,29 @@
             search: '',
             selectedCategory: 'all',
             cart: [],
-            customerName: '{{ old('customer_name', '') }}',
-            tableNumber: '{{ old('table_number', '') }}',
+            customerName: @json(old('customer_name', '')),
+            tableNumber: @json(old('table_number', '')),
             redirectToPayment: '0',
             isSubmitting: false,
+            oldItems: @json(old('items', [])),
+
+            init() {
+                if (Array.isArray(this.oldItems) && this.oldItems.length > 0) {
+                    this.oldItems.forEach(oldItem => {
+                        const menu = this.menus.find(m => m.id === Number(oldItem.menu_id));
+                        if (menu && menu.stock > 0) {
+                            this.cart.push({
+                                id: menu.id,
+                                name: menu.name,
+                                price: menu.price,
+                                stock: menu.stock,
+                                quantity: Math.min(Number(oldItem.quantity) || 1, menu.stock),
+                                image_url: menu.image_url,
+                            });
+                        }
+                    });
+                }
+            },
 
             get filteredMenus() {
                 let list = this.menus;

@@ -19,8 +19,8 @@ class CustomerOrderController extends Controller
     public function index(Request $request): View
     {
         $categories = Category::query()
-            ->with(['menus' => function ($query) {
-                $query->where('is_available', true)->orderBy('name');
+            ->withCount(['menus' => function ($query) {
+                $query->where('is_available', true);
             }])
             ->orderBy('name')
             ->get();

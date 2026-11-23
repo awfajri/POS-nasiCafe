@@ -59,14 +59,14 @@
             @foreach ($categories as $category)
                 <button
                     type="button"
-                    @click="selectedCategory = '{{ $category->id }}'"
-                    :class="selectedCategory === '{{ $category->id }}'
+                    @click="selectedCategory = @json((string) $category->id)"
+                    :class="selectedCategory === @json((string) $category->id)
                         ? 'bg-[#2b2d6e] text-white shadow-xs'
                         : 'bg-white border border-surface-border text-slate-600 hover:bg-slate-50'"
                     class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition shrink-0 whitespace-nowrap"
                 >
                     {{ $category->name }}
-                    <span class="text-xs opacity-75">({{ $category->menus->where('is_available', true)->count() }})</span>
+                    <span class="text-xs opacity-75">({{ $category->menus_count }})</span>
                 </button>
             @endforeach
         </div>
@@ -466,9 +466,33 @@
             search: '',
             selectedCategory: 'all',
             cart: [],
-            tableNumber: '{{ old('table_number', '') }}',
+            tableNumber: @json(old('table_number', '')),
             cartDrawerOpen: false,
             isSubmitting: false,
+            oldItems: @json(old('items', [])),
+            hasValidationErrors: @json($errors->any()),
+
+            init() {
+                if (Array.isArray(this.oldItems) && this.oldItems.length > 0) {
+                    this.oldItems.forEach(oldItem => {
+                        const menu = this.menus.find(m => m.id === Number(oldItem.menu_id));
+                        if (menu && menu.stock > 0) {
+                            this.cart.push({
+                                id: menu.id,
+                                name: menu.name,
+                                price: menu.price,
+                                stock: menu.stock,
+                                quantity: Math.min(Number(oldItem.quantity) || 1, menu.stock),
+                                image_url: menu.image_url,
+                            });
+                        }
+                    });
+                }
+
+                if (this.hasValidationErrors && this.cart.length > 0) {
+                    this.cartDrawerOpen = true;
+                }
+            },
 
             get filteredMenus() {
                 let list = this.menus;
