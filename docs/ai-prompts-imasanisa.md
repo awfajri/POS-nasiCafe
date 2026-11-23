@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                                                                                                                                                        Showing [6] routes
+                                                                                                                                                                                                Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,7 +299,7 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                                                                                                                                                        Showing [7] routes
+                                                                                                                                                                                                Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
 
@@ -724,3 +724,50 @@ Di kolom Stok & Status, angka stok sama Min. stok aku pisah barisnya, lalu badge
 Di kolom Quick Restock, lebar input jumlah kubuat w-20 dengan latar bg-surface-light dan tombol Update, terus popup konfirmasi hapus aku pakaiin @js(...).
 
 Hasil tes di browser: filter dan reset jalan sesuai query, popup konfirmasi hapus muncul dengan nama menunya, dan tombol Tambah Menu / Edit mengarah ke owner.menus.form yang bakal dikerjain di Prompt 17.
+
+---
+
+## Prompt 17 - View form menu (tambah dan edit)
+
+- Tanggal: 24 November 2026
+- Branch: feature/master-crud
+- Tool AI: Antigravity (model Gemini 3.8 Flash)
+- Bagian yang diminta: resources/views/owner/menus/form.blade.php
+
+### Prompt yang dikirim
+
+Lanjut lanjut lanjut lagi ya, aku masih ngerjain modul Master Data proyek "NasiCafe POS" (Laravel 13, Tailwind, Alpine.js), branch feature/master-crud. MenuController dan view daftar menu (resources/views/owner/menus/index.blade.php) sudah selesai. Sekarang tugasnya HANYA membuat view resources/views/owner/menus/form.blade.php yang dipakai untuk tambah menu (create) maupun edit menu (edit).
+
+kayak biasa sebelum menulis, liat dulu resources/views/layouts/app.blade.php, folder resources/views/components, dan App\Http\Requests\MenuRequest serta MenuController (create, store, edit, update), lalu ikuti gaya yang sudah dipakai. Cek juga apakah layout sudah menampilkan <x-alert /> sendiri. Kalau sudah, jangan tampilkan lagi di view supaya pesannya tidak dobel.
+
+Aturan umumnyaa:
+
+1. Awali dengan @extends('layouts.app'), @section('title', ...), dan @section('content').
+2. Output pakai {{ }}, dilarang {!! !!}. Setiap form wajib @csrf.
+3. Desain rapi, konsisten dengan layout yang ada, dan tidak terlihat seperti template generik. Pakai class Tailwind yang sudah dipakai di layout.
+4. Semua teks berbahasa Indonesia.
+
+Ketentuan khusus resources/views/owner/menus/form.blade.php (variabel dari controller: $menu bernilai null saat tambah, instance Menu saat edit; serta $categories):
+
+1. Judul halaman dan heading berbeda: "Tambah Menu" saat $menu null, dan "Edit Menu" saat $menu tidak null.
+2. Form method POST dan sertakan enctype="multipart/form-data" karena ada unggah foto. Saat tambah ($menu null), action ke route('owner.menus.store'). Saat edit ($menu tidak null), action ke route('owner.menus.update', $menu) dan tambahkan @method('PUT'). Sertakan @csrf.
+3. Field input mengikuti MenuRequest:
+    - category_id (select dropdown daftar $categories, wajib, nilai awal old('category_id', $menu?->category_id)).
+    - name (input teks, wajib, nilai awal old('name', $menu?->name)).
+    - description (textarea opsional, nilai awal old('description', $menu?->description)).
+    - price (input angka, wajib, nilai awal old('price', $menu?->price)).
+    - stock (input angka, wajib, nilai awal old('stock', $menu?->stock)).
+    - min_stock (input angka, wajib, nilai awal old('min_stock', $menu?->min_stock)).
+    - is_available (checkbox status jual aktif/tersedia, nilai awal old('is_available', $menu?->is_available ?? true) dengan aman di-cast boolean).
+    - image (input file foto menu, opsional, terima format gambar seperti jpg/jpeg/png/webp). Saat mode edit dan $menu?->image_path ada, tampilkan pratinjau foto saat ini dengan fallback aman bila file tidak ada.
+4. Tampilkan pesan error validasi per field dengan @error(...) dan beri gaya border error pada field yang bermasalah.
+5. Sediakan tombol simpan ("Simpan" saat tambah atau "Simpan Perubahan" / "Simpan" yang jelas) dan tombol "Batal" yang kembali ke route('owner.menus.index').
+
+oooo iyaaa JANGAN mengubah controller, route, model, request, layout, komponen, atau file lain. JANGAN menjalankan perintah terminal. Komentar Blade singkat berbahasa Indonesia seperlunya.
+
+### Hasil
+
+- File dihasilkan: resources/views/owner/menus/form.blade.php
+- Commit mentah AI: chore: draft AI view form menu (belum direview)
+
+### Hasil review dan perubahan oleh saya
