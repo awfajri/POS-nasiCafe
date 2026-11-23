@@ -392,21 +392,22 @@
 @endsection
 
 @push('scripts')
+@php
+    $menusPayload = $menus->map(fn ($menu) => [
+        'id' => $menu->id,
+        'name' => $menu->name,
+        'price' => (int) $menu->price,
+        'stock' => (int) $menu->stock,
+        'min_stock' => (int) $menu->min_stock,
+        'category_id' => (string) $menu->category_id,
+        'category_name' => $menu->category?->name ?? 'Lainnya',
+        'image_url' => $menu->image_url,
+    ])->values();
+@endphp
 <script>
     function posApp() {
         return {
-            menus: @json($menus->map(function ($menu) {
-                return [
-                    'id' => $menu->id,
-                    'name' => $menu->name,
-                    'price' => (int) $menu->price,
-                    'stock' => (int) $menu->stock,
-                    'min_stock' => (int) $menu->min_stock,
-                    'category_id' => (string) $menu->category_id,
-                    'category_name' => $menu->category?->name ?? 'Lainnya',
-                    'image_url' => $menu->image_url,
-                ];
-            })),
+            menus: @json($menusPayload),
             search: '',
             selectedCategory: 'all',
             cart: [],
@@ -415,7 +416,6 @@
             redirectToPayment: '0',
             isSubmitting: false,
             oldItems: @json(old('items', [])),
-
             init() {
                 if (Array.isArray(this.oldItems) && this.oldItems.length > 0) {
                     this.oldItems.forEach(oldItem => {
