@@ -288,7 +288,7 @@ ATURAN CONTROLLER (STUB SAJA)
   DELETE owner/categories/{category} owner.categories.dest…
   GET|HEAD owner/categories/{category}/edit owner.categories…
 
-                                                                                                                                                                                                      Showing [6] routes
+                                                                                                                                                                                                                Showing [6] routes
 
     route:list --name=owner.menus
     GET|HEAD owner/menus owner.menus.index › MenuController@in…
@@ -299,7 +299,7 @@ ATURAN CONTROLLER (STUB SAJA)
     GET|HEAD owner/menus/{menu}/edit owner.menus.edit › MenuCo…
     PATCH owner/menus/{menu}/stock owner.menus.stock › Menu…
 
-                                                                                                                                                                                                      Showing [7] routes
+                                                                                                                                                                                                                Showing [7] routes
 
 ### Hasil review dan perubahan oleh saya
 
@@ -775,3 +775,46 @@ oooo iyaaa JANGAN mengubah controller, route, model, request, layout, komponen, 
 Aku sudah cek resources/views/owner/menus/form.blade.php dan mencocokkannya sama layout serta aturan proyek. View udah memakai @extends('layouts.app'), @section('title', ...) dan @section('content'), semua data memakai {{ }} tanpa {!! !!}, form udah ada @csrf, enctype="multipart/form-data", dan @method('PUT') saat edit, nilai awal memakai old(...) dengan fallback ke $menu (serta default yang sesuai), pesan error per field pakai @error(...), tombol Batal mengarah ke route('owner.menus.index'), dan <x-alert /> tidak ditampilkan lagi di view karena udah muncul dari layout.
 
 Pas aku tes dan liat langsung di browser, tombol simpan (Simpan Perubahan / Simpan Menu) kelihatan agak mepet pinggir dan kurang lega, jadi padding serta whitespace-nowrap-nya aku rapihin di view. Hasil uji di browser: mode tambah (/owner/menus/create) dan edit (/owner/menus/5/edit) tampil sesuai data, simpan perubahan menu berhasil dengan notifikasi sukses, dan tambah menu baru (Es Jeruk Tes) juga berhasil masuk ke daftar menu. (Kalau menu tes Es Jeruk Tes nggak dipakai lagi, bisa dihapus lewat tombol Hapus di daftar menu.)
+
+## Prompt 18 - MenuTest (Feature Test Master Data)
+
+- Tanggal: 25 November 2026
+- Branch: feature/master-qa-test
+- Tool AI: Antigravity
+- Bagian yang diminta: tests/Feature/MenuTest.php
+
+### Prompt yang dikirim
+
+haloo lanjut lagi ya, aku masih ngerjain modul Master Data proyek "NasiCafe POS" (Laravel 13, PHP 8.5, MySQL), branch feature/master-qa-test. Fase 1 dan Fase 2 (migration, model, factory, Form Request, controller, dan view kategori serta menu) sudah selesai dan ter-merge ke develop. Sekarang masuk Fase 3: tugasnya cuma membuat SATU file feature test `tests/Feature/MenuTest.php` untuk menguji modul Master Data (poin P4).
+
+Sebelum menulis, liat dulu `tests/Feature/UserControllerTest.php` dan `tests/Feature/ExampleTest.php` agar gaya penulisan test (Pest atau PHPUnit) seragam dengan standar tim, serta cek `app/Models/User.php`, `Category.php`, `Menu.php`, `Transaction.php`, dan `TransactionDetail.php` supaya pemanggilan factory dan relasinya akurat.
+
+Aturan skenario pengujian yang wajib ada di `tests/Feature/MenuTest.php`:
+
+1. Hak akses role: kasir (`cashier`) dan pelanggan (`customer`) mendapat status 403 saat mengakses `/owner/categories` atau `/owner/menus`, sedangkan `owner` berhasil mengaksesnya (200).
+2. CRUD Kategori: owner bisa menambah, mengubah, dan menghapus kategori kosong; namun ditolak (session error pada key `category`) jika kategori masih memiliki menu.
+3. CRUD Menu & Upload Foto (gunakan `Storage::fake('public')` dan `UploadedFile::fake()->image(...)`): owner bisa menambah menu dengan foto valid (jpg/png/webp <= 2MB), file tersimpan di disk `public` folder `menus` dengan nama acak, dan `image_path` tercatat di database.
+4. Validasi Upload Foto: upload file non-gambar (misal `UploadedFile::fake()->create('dokumen.pdf', 100, 'application/pdf')`) atau gambar > 2MB (misal `2500` KB) ditolak dengan error validasi pada `image`.
+5. Hapus Foto Lama saat Update: saat menu diperbarui dengan foto baru, foto lama terhapus dari disk `public` dan foto baru tersimpan.
+6. Proteksi Hapus Menu: menu yang belum pernah dipakai di `transaction_details` bisa dihapus beserta fotonya; menu yang sudah pernah dipakai di `transaction_details` ditolak penghapusannya (session error pada key `menu`).
+7. Quick Restock (`PATCH /owner/menus/{menu}/stock`): aksi `add` menambah stok, aksi `set` mengatur stok langsung, dan aksi `add` yang membuat total stok melebihi `100000` ditolak dengan error validasi.
+
+Aturan tambahannya
+
+- Gunakan `RefreshDatabase`.
+- JANGAN membuat atau mengubah file lain (controller, model, route, migration, view, maupun test milik anggota lain).
+- JANGAN menjalankan perintah terminal.
+- Tambahkan komentar singkat berbahasa Indonesia di setiap test case supaya mudah dipelajari.
+
+### Hasil
+
+- File dihasilkan: tests/Feature/MenuTest.php
+- Commit mentah AI: test: draft AI MenuTest untuk modul master data (belum direview)
+
+### Hasil review dan perubahan oleh saya
+
+### Hasil review dan perubahan oleh saya
+
+Seluruh 15 skenario pengujian pada `tests/Feature/MenuTest.php` uda dijalanin menggunakan perintah `php artisan test --filter=MenuTest` dan seluruhnya lulus (`15 passed, 52 assertions`).
+
+oh yah aku menghapus blok komentar _docblock_ (`/** ... */`) dan komentar _inline_ yang bersifat redundan di atas masing-masing method pengujian karena nama setiap method sudah cukup deskriptif, sehingga file pengujian lebih ringkas dan mudah dibaca tanpa mengubah perilaku pengujian.

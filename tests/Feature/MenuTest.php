@@ -33,23 +33,15 @@ class MenuTest extends TestCase
     // 1. PENGUJIAN HAK AKSES ROLE (OWNER, CASHIER, CUSTOMER)
     // =========================================================================
 
-    /**
-     * Kasir dan pelanggan tidak boleh mengakses rute master data (403 Forbidden).
-     */
     public function test_kasir_dan_pelanggan_tidak_dapat_mengakses_halaman_master_data(): void
     {
-        // Kasir dilarang mengakses kategori dan menu
         $this->actingAs($this->cashier)->get(route('owner.categories.index'))->assertForbidden();
         $this->actingAs($this->cashier)->get(route('owner.menus.index'))->assertForbidden();
 
-        // Pelanggan dilarang mengakses kategori dan menu
         $this->actingAs($this->customer)->get(route('owner.categories.index'))->assertForbidden();
         $this->actingAs($this->customer)->get(route('owner.menus.index'))->assertForbidden();
     }
 
-    /**
-     * Owner diizinkan mengakses halaman master data (200 OK).
-     */
     public function test_owner_dapat_mengakses_halaman_master_data(): void
     {
         $this->actingAs($this->owner)->get(route('owner.categories.index'))->assertOk();
@@ -60,9 +52,6 @@ class MenuTest extends TestCase
     // 2. PENGUJIAN CRUD KATEGORI
     // =========================================================================
 
-    /**
-     * Owner dapat menambah kategori baru beserta slug otomatis.
-     */
     public function test_owner_bisa_menambah_kategori(): void
     {
         $payload = [
@@ -80,9 +69,6 @@ class MenuTest extends TestCase
         ]);
     }
 
-    /**
-     * Owner dapat mengubah kategori yang sudah ada dan slug ikut terbarukan.
-     */
     public function test_owner_bisa_mengubah_kategori(): void
     {
         $category = Category::factory()->create([
@@ -106,9 +92,6 @@ class MenuTest extends TestCase
         ]);
     }
 
-    /**
-     * Owner dapat menghapus kategori yang masih kosong (tidak memiliki menu).
-     */
     public function test_owner_bisa_menghapus_kategori_kosong(): void
     {
         $category = Category::factory()->create();
@@ -121,9 +104,6 @@ class MenuTest extends TestCase
         ]);
     }
 
-    /**
-     * Penghapusan kategori ditolak jika masih terdapat menu terkait.
-     */
     public function test_hapus_kategori_ditolak_jika_masih_memiliki_menu(): void
     {
         $category = Category::factory()->create();
@@ -141,9 +121,6 @@ class MenuTest extends TestCase
     // 3. PENGUJIAN CRUD MENU & UPLOAD FOTO
     // =========================================================================
 
-    /**
-     * Owner bisa menambah menu baru dengan foto valid yang tersimpan di disk public dengan nama acak.
-     */
     public function test_owner_bisa_menambah_menu_dengan_foto_valid(): void
     {
         Storage::fake('public');
@@ -183,9 +160,6 @@ class MenuTest extends TestCase
     // 4. PENGUJIAN VALIDASI UPLOAD FOTO
     // =========================================================================
 
-    /**
-     * Upload file non-gambar ditolak oleh validasi pada kolom image.
-     */
     public function test_upload_file_non_gambar_ditolak_validasi(): void
     {
         Storage::fake('public');
@@ -209,9 +183,6 @@ class MenuTest extends TestCase
         $this->assertDatabaseMissing('menus', ['name' => 'Menu Uji Non Gambar']);
     }
 
-    /**
-     * Upload foto dengan ukuran melebihi 2MB (2048 KB) ditolak oleh validasi.
-     */
     public function test_upload_gambar_melebihi_2mb_ditolak_validasi(): void
     {
         Storage::fake('public');
@@ -239,9 +210,6 @@ class MenuTest extends TestCase
     // 5. PENGUJIAN UPDATE FOTO (HAPUS FOTO LAMA)
     // =========================================================================
 
-    /**
-     * Saat menu diupdate dengan foto baru, foto lama dihapus dari disk public dan foto baru tersimpan.
-     */
     public function test_foto_lama_terhapus_dari_disk_public_saat_menu_diperbarui_dengan_foto_baru(): void
     {
         Storage::fake('public');
@@ -278,9 +246,6 @@ class MenuTest extends TestCase
     // 6. PENGUJIAN PROTEKSI HAPUS MENU
     // =========================================================================
 
-    /**
-     * Menu yang belum pernah dipakai di transaksi dapat dihapus beserta filenya.
-     */
     public function test_menu_yang_belum_pernah_dipakai_di_transaksi_bisa_dihapus_beserta_fotonya(): void
     {
         Storage::fake('public');
@@ -298,9 +263,6 @@ class MenuTest extends TestCase
         Storage::disk('public')->assertMissing($path);
     }
 
-    /**
-     * Menu yang sudah pernah dipakai di transaction_details ditolak penghapusannya.
-     */
     public function test_menu_yang_sudah_pernah_dipakai_di_transaksi_ditolak_penghapusannya(): void
     {
         $menu = Menu::factory()->create();
@@ -316,9 +278,6 @@ class MenuTest extends TestCase
     // 7. PENGUJIAN QUICK RESTOCK
     // =========================================================================
 
-    /**
-     * Aksi Quick Restock 'add' berhasil menambahkan jumlah stok menu.
-     */
     public function test_quick_restock_aksi_add_menambah_stok(): void
     {
         $menu = Menu::factory()->create(['stock' => 10]);
@@ -333,9 +292,6 @@ class MenuTest extends TestCase
         $this->assertSame(25, $menu->stock);
     }
 
-    /**
-     * Aksi Quick Restock 'set' berhasil mengatur nilai stok menu secara langsung.
-     */
     public function test_quick_restock_aksi_set_mengatur_stok_langsung(): void
     {
         $menu = Menu::factory()->create(['stock' => 10]);
@@ -350,9 +306,6 @@ class MenuTest extends TestCase
         $this->assertSame(50, $menu->stock);
     }
 
-    /**
-     * Aksi Quick Restock 'add' yang membuat total stok melebihi 100000 ditolak validasi.
-     */
     public function test_quick_restock_aksi_add_yang_membuat_total_stok_melebihi_100000_ditolak(): void
     {
         $menu = Menu::factory()->create(['stock' => 99990]);
