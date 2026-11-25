@@ -12,11 +12,7 @@
             <x-stat-card title="Total Hari Ini" :value="'Rp '.number_format($totalToday, 0, ',', '.')" icon="money" color="brand" />
         </div>
 
-        <x-low-stock-banner
-            :should-display="$lowStockMenus->isNotEmpty()"
-            :count="$lowStockMenus->count()"
-            :low-stock-menus="$lowStockMenus"
-        />
+
 
         <section class="rounded-3xl border border-slate-200/90 bg-white p-5 shadow-xs sm:p-6">
             <div class="mb-5 flex items-center justify-between gap-3">
