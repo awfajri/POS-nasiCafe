@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class TransactionController extends Controller
@@ -18,23 +19,27 @@ class TransactionController extends Controller
 
     public function index(Request $request): View
     {
+        $filters = $request->validate([
+            'search' => ['nullable', 'string', 'max:100'],
+            'status' => ['nullable', Rule::in(Transaction::STATUSES)],
+            'payment_status' => ['nullable', Rule::in(Transaction::PAYMENT_STATUSES)],
+            'date_from' => ['nullable', 'date'],
+            'date_to' => ['nullable', 'date', 'after_or_equal:date_from'],
+        ]);
+
         $transactions = Transaction::query()
-            ->with(['user', 'cashier'])
-            ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')->toString()))
-            ->when($request->filled('search'), function ($query) use ($request): void {
-                $term = $request->string('search')->toString();
-                $query->where(function ($query) use ($term): void {
-                    $query->where('invoice_code', 'like', "%{$term}%")
-                        ->orWhere('customer_name', 'like', "%{$term}%");
-                });
-            })
+            ->with('cashier')
+            ->search($filters['search'] ?? null)
+            ->when($filters['status'] ?? null, fn ($query, $value) => $query->where('status', $value))
+            ->when($filters['payment_status'] ?? null, fn ($query, $value) => $query->where('payment_status', $value))
+            ->when($filters['date_from'] ?? null, fn ($query, $value) => $query->whereDate('created_at', '>=', $value))
+            ->when($filters['date_to'] ?? null, fn ($query, $value) => $query->whereDate('created_at', '<=', $value))
             ->latest()
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         return view('transactions.index', compact('transactions'));
     }
-
     public function show(Transaction $transaction): View
     {
         $transaction->load(['details.menu', 'user', 'cashier', 'payments.cashier']);
