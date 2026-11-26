@@ -20,7 +20,7 @@ Route::middleware('guest')->group(function () {
 
 // Logout wajib POST (bukan GET) supaya tidak bisa dipicu lewat link.
 Route::post('/logout', [AuthController::class, 'logout'])
-    ->middleware('auth')
+    ->middleware(['auth', 'role:owner,cashier,customer'])
     ->name('logout');
 
 // Ubah sandi: semua peran. Pakai role:... (bukan cuma auth) supaya is_active ikut dicek.
