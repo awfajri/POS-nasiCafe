@@ -85,7 +85,7 @@ class PaymentController extends Controller
     public function confirmQris(Request $request, Transaction $transaction): RedirectResponse
     {
         if (
-            $transaction->source !== 'self_order'
+            $transaction->source !== Transaction::SOURCE_SELF_ORDER
             || $transaction->status !== Transaction::STATUS_PENDING
             || $transaction->payment_status !== Transaction::PAYMENT_UNPAID
         ) {
