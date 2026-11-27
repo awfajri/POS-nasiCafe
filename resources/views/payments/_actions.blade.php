@@ -3,7 +3,7 @@
     $isCashier = $user && $user->isCashier();
     $payments = $transaction->payments ?? collect();
     $canConfirmQris = $isCashier
-        && $transaction->source === 'self_order'
+        && $transaction->source === \App\Models\Transaction::SOURCE_SELF_ORDER
         && $transaction->status === \App\Models\Transaction::STATUS_PENDING
         && $transaction->payment_status === \App\Models\Transaction::PAYMENT_UNPAID;
 @endphp
