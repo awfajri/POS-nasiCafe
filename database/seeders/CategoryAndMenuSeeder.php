@@ -19,10 +19,11 @@ class CategoryAndMenuSeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            ['name' => 'Nasi Spesial', 'description' => 'Aneka nasi andalan NasiCafe.'],
-            ['name' => 'Lauk Pauk', 'description' => 'Lauk pendamping nasi.'],
+            ['name' => 'Menu Nasi', 'description' => 'Aneka menu dengan nasi sebagai makanan pokok.'],
+            ['name' => 'Aneka Mie', 'description' => 'Aneka masakan mie dan semacamnya.'],
+            ['name' => 'Toping', 'description' => 'Tambahan toping untuk hidangan utama.'],
             ['name' => 'Minuman', 'description' => 'Minuman dingin dan hangat.'],
-            ['name' => 'Camilan', 'description' => 'Camilan gurih dan manis.'],
+            ['name' => 'Camilan', 'description' => 'Cemilan dan makanan ringan.'],
         ];
 
         $categoryIds = [];
@@ -41,24 +42,42 @@ class CategoryAndMenuSeeder extends Seeder
 
         // [nama, kategori, harga, stok, min_stock]
         $menus = [
-            // Nasi Spesial
-            ['Nasi Goreng Spesial', 'Nasi Spesial', 25000, 20, 5],
-            ['Nasi Ayam Bakar Madu', 'Nasi Spesial', 28000, 15, 5],
-            ['Nasi Ayam Geprek Sambal Bawang', 'Nasi Spesial', 22000, 3, 5],   // low stock
-            ['Nasi Gila NasiCafe', 'Nasi Spesial', 30000, 10, 5],
-            // Lauk Pauk
-            ['Ayam Goreng Lengkuas', 'Lauk Pauk', 18000, 12, 5],
-            ['Bebek Goreng Crispy', 'Lauk Pauk', 25000, 2, 5],                 // low stock
-            ['Tempe Mendoan', 'Lauk Pauk', 8000, 0, 5],                        // out of stock
-            ['Tahu Crispy Cabe Garam', 'Lauk Pauk', 10000, 8, 5],
+            // Menu Nasi
+            ['Nasi Goreng Nasicafe', 'Menu Nasi', 14000, 20, 5],
+            ['Ayam Katsu', 'Menu Nasi', 20000, 15, 5],
+            ['Nasi Ayam Penyet', 'Menu Nasi', 14000, 3, 5],   // low stock
+            // Aneka Mie
+            ['Mie Goreng Jawa', 'Aneka Mie', 14000, 12, 5],
+            ['Mie Tek Tek', 'Aneka Mie', 14000, 2, 5],                 // low stock
+            ['Indomie', 'Aneka Mie', 8000, 0, 5],                        // out of stock
+            ['Bihun Ayam Kuah/Goreng', 'Aneka Mie', 14000, 8, 5],
+            ['Spaghety', 'Aneka Mie', 10000, 10, 5],
+            // Toping
+            ['Telur Dadar', 'Toping', 3000, 45, 5],
             // Minuman
-            ['Kopi Susu Gula Aren', 'Minuman', 18000, 25, 5],
-            ['Teh Manis Dingin', 'Minuman', 6000, 1, 5],                       // low stock
-            ['Jus Alpukat', 'Minuman', 15000, 10, 5],
-            ['Lemon Tea Segar', 'Minuman', 12000, 14, 5],
-            // Camilan
-            ['Pisang Goreng Crispy', 'Camilan', 12000, 18, 5],
-            ['Kentang Goreng Keju', 'Camilan', 15000, 22, 5],
+            ['Susu Jahe', 'Minuman', 7000, 25, 5],
+            ['Chocolate Cloud', 'Minuman', 10000, 24, 5],
+            ['Teh Manis', 'Minuman', 5000, 1, 5],                       // low stock
+            ['Lemon Tea', 'Minuman', 7000, 10, 5],
+            ['Teh Tarik', 'Minuman', 9000, 14, 5],
+            ['Milo', 'Minuman', 9000, 19, 5],
+            ['Teh Pucuk', 'Minuman', 5000, 15, 5],
+            ['Air Mineral', 'Minuman', 5000, 30, 5],
+            ["Kopi O'", 'Minuman', 5000, 10, 5],
+            ['Kopi Susu', 'Minuman', 8000, 17, 5],
+            ['Matcha Latte', 'Minuman', 10000, 25, 5],
+            ['Matcha Frappe', 'Minuman', 10000, 21, 5],
+            ['Cappucino', 'Minuman', 9000, 28, 5],
+            ['Hot/Cold Chocolate', 'Minuman', 9000, 19, 5],
+            ['Lychee Tea', 'Minuman', 7000, 13, 5],
+            // Camilan Ringan
+            ['Siomay', 'Camilan', 10000, 18, 5],
+            ['French Fries', 'Camilan', 10000, 22, 5],
+            ['Dimsum Ayam', 'Camilan', 10000, 13, 5],
+            ['Dimsum Lumer', 'Camilan', 12000, 12, 5],
+            ['Roti Bakar', 'Camilan', 10000, 6, 5],
+            ['Kongkow Plater', 'Camilan', 15000, 10, 5],
+            ['Bakwan Sayur', 'Camilan', 10000, 0, 5],
         ];
 
         foreach ($menus as [$name, $categoryName, $price, $stock, $minStock]) {
