@@ -72,7 +72,7 @@
 
                             <img src="{{ asset(config('nasicafe.qris_image')) }}" alt="Kode QRIS NasiCafe"
                                 class="mx-auto size-48 rounded-lg bg-white object-contain p-2 ring-1 ring-surface-border">
-
+                            
                             <p class="text-sm text-ink-muted">
                                 Bayar sebesar <span class="font-semibold text-ink-primary">{{ rupiah($order->total_amount) }}</span>,
                                 lalu kabari kasir lewat WhatsApp.
@@ -98,7 +98,14 @@
                                     <span x-show="remaining === 0" style="display: none" class="font-semibold text-status-danger">Waktu habis, muat ulang halaman</span>
                                 </div>
                             @endif
-
+                            <div>
+                                <a href="{{ asset(config('nasicafe.qris_image')) }}"
+                                    download="QRIS-NasiCafe.png"
+                                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-ink-primary ring-1 ring-surface-border transition hover:bg-surface-card focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2">
+                                    <x-lucide-download class="size-4" />
+                                    Download QRIS
+                                </a>
+                            </div>
                             <a href="{{ $waUrl }}" target="_blank" rel="noopener noreferrer"
                                 class="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2">
                                 <x-lucide-message-circle class="size-4" />
