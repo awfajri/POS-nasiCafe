@@ -17,14 +17,63 @@ class ReportService
         'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des',
     ];
 
+    /**
+     * Ringkasan laporan pada rentang tanggal.
+     *
+     * Definisi omzet: penjumlahan `paid_amount` transaksi yang tidak
+     * dibatalkan. Omzet per metode dihitung dari relasi payments.
+     *
+     * @return array{
+     *     total_transactions: int,
+     *     omzet: int,
+     *     status_counts: array<string, int>,
+     *     cash: int,
+     *     qris: int,
+     * }
+     */
     public function summary(Carbon $start, Carbon $end): array
     {
-        throw new \LogicException(__METHOD__.' belum diimplementasi');
+        $query = Transaction::query()
+            ->whereBetween('created_at', [$start, $end]);
+
+        $totalTransactions = (clone $query)->count();
+
+        $omzet = (clone $query)
+            ->where('status', '!=', Transaction::STATUS_CANCELLED)
+            ->sum('paid_amount');
+
+        $statusCounts = (clone $query)
+            ->get(['status'])
+            ->groupBy('status')
+            ->map(fn (Collection $group): int => $group->count())
+            ->all();
+
+        // Omzet per metode: jumlahkan amount_paid dari pembayaran pada
+        // rentang, dikelompokkan payment_method.
+        $methodTotals = $query
+            ->with('payments')
+            ->get()
+            ->flatMap(fn (Transaction $tx): Collection => $tx->payments)
+            ->groupBy('payment_method')
+            ->map(fn (Collection $group): int => (int) $group->sum('amount_paid'));
+
+        return [
+            'total_transactions' => $totalTransactions,
+            'omzet' => (int) $omzet,
+            'status_counts' => $statusCounts,
+            'cash' => (int) ($methodTotals['cash'] ?? 0),
+            'qris' => (int) ($methodTotals['qris'] ?? 0),
+        ];
     }
 
+    /**
+     * Query baris transaksi pada rentang tanggal, lengkap dengan kasir.
+     */
     public function rowsQuery(Carbon $start, Carbon $end): Builder
     {
-        throw new \LogicException(__METHOD__.' belum diimplementasi');
+        return Transaction::query()
+            ->with('cashier')
+            ->whereBetween('created_at', [$start, $end]);
     }
 
     /**

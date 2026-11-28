@@ -59,6 +59,12 @@ class TransactionSeeder extends Seeder
                 ->subDays($day)
                 ->setTime(fake()->numberBetween(8, 21), fake()->numberBetween(0, 59), 0);
 
+            // Transaksi hari ini tidak boleh ber-timestamp masa depan
+            // (nota tidak mungkin dibuat sebelum jamnya berlalu).
+            if ($day === 0 && $createdAt->isAfter(now())) {
+                $createdAt = now();
+            }
+
             $this->createTransaction($spec, $createdAt, $menus, $cashier, $customer);
         }
     }
